@@ -1,6 +1,6 @@
 package com.mobilepiscine42.calculator
 
-import androidx.appcompat.app.AppCompatActivity
+import android.icu.math.BigDecimal
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -9,10 +9,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.HorizontalScrollView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import net.objecthunter.exp4j.ExpressionBuilder
-
-
-//TODO add input scroll left-right
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,6 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var result: TextView
     private lateinit var horizontalScrollView: HorizontalScrollView
     private var canAddSign = false
+    private var endOfCalculation = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +66,7 @@ class MainActivity : AppCompatActivity() {
     fun numberClicked(view: View) {
         if (view is Button) {
             buttonClicked(view)
+            checkEndOfCalculation()
             result.text= ""
             if (view.text == ".") {
                 appendDotOperator(view)
@@ -84,9 +84,10 @@ class MainActivity : AppCompatActivity() {
     fun letterClicked(view: View) {
         if (view is Button) {
             buttonClicked(view)
+            checkEndOfCalculation()
             when (view.text) {
                 "C" -> backSpaceAction(view)
-                "AC" -> allClearAction(view)
+                "AC" -> allClearAction()
             }
         }
     }
@@ -94,6 +95,7 @@ class MainActivity : AppCompatActivity() {
     fun operatorClicked(view: View) {
         if (view is Button) {
             buttonClicked(view)
+            checkEndOfCalculation()
             when(view.text) {
                 "-" -> appendMinusOperator(view)
                 "+" -> appendOperator(view)
@@ -101,7 +103,6 @@ class MainActivity : AppCompatActivity() {
                 "/" -> appendOperator(view)
                 "=" -> {
                     result.text = calculateExpression()
-                    input.text = ""
                 }
             }
         }
@@ -110,14 +111,11 @@ class MainActivity : AppCompatActivity() {
     private fun calculateExpression(): String {
         if (input.text.isEmpty())
             return ""
+        endOfCalculation = true
         return try {
             val e = ExpressionBuilder(input.text.toString()).build()
             val res = e.evaluate()
-            if (res % 1.0 == 0.0) {
-                res.toString().replace(Regex("\\.0$"), "")
-            } else {
-                res.toString()
-            }
+            BigDecimal(res).toString()
         } catch (ex: Exception) {
             ex.localizedMessage ?:"Error"
         }
@@ -137,15 +135,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun allClearAction(view: View) {
+    private fun allClearAction() {
         input.text = ""
         result.text = ""
     }
 
+    private fun checkEndOfCalculation() {
+        if (endOfCalculation) {
+            allClearAction()
+            endOfCalculation = false
+        }
+    }
+
     private fun backSpaceAction(view: View) {
-        if (input.length() > 0) {
+        if (input.length() > 1) {
             input.text = input.text.substring(0, input.length() - 1)
             if (input.text.last().isDigit()) { canAddSign = true }
+        } else {
+            input.text = ""
         }
     }
 
