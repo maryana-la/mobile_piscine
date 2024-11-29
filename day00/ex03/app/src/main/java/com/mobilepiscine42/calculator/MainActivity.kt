@@ -1,6 +1,5 @@
 package com.mobilepiscine42.calculator
 
-import android.icu.math.BigDecimal
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +10,9 @@ import android.widget.HorizontalScrollView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import net.objecthunter.exp4j.ExpressionBuilder
+import java.math.MathContext.DECIMAL64
+import java.math.BigDecimal
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
             input.text = savedInstanceState.getString("INPUT_TEXT", "")
             result.text = savedInstanceState.getString("RESULT_TEXT", "")
             canAddSign = savedInstanceState.getBoolean("CAN_ADD_SIGN", false)
+            endOfCalculation = savedInstanceState.getBoolean("END_OF_CALCULATION", false)
         }
 
         input.addTextChangedListener(object : TextWatcher {
@@ -57,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         outState.putString("INPUT_TEXT", input.text.toString())
         outState.putString("RESULT_TEXT", result.text.toString())
         outState.putBoolean("CAN_ADD_SIGN", canAddSign)
+        outState.putBoolean("END_OF_CALCULATION", endOfCalculation)
     }
 
     private fun buttonClicked(button: Button) {
@@ -115,7 +119,12 @@ class MainActivity : AppCompatActivity() {
         return try {
             val e = ExpressionBuilder(input.text.toString()).build()
             val res = e.evaluate()
-            BigDecimal(res).toString()
+            val decimal = BigDecimal(res, DECIMAL64)
+            if (decimal.scale() <= 0) {
+                decimal.toString()
+            } else {
+                decimal.stripTrailingZeros().toString()
+            }
         } catch (ex: Exception) {
             ex.localizedMessage ?:"Error"
         }
@@ -157,7 +166,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun appendOperator(button: Button) {
-        if (input.text.isEmpty())
+        if (input.text.isEmpty() || (input.text.length == 1 && input.text.startsWith('-')))
             return
         val ch = input.text.last()
         if (canAddSign) {
