@@ -31,8 +31,8 @@
 
             <ImageButton
                 android:id="@+id/searchGeoButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="end"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Use current location"

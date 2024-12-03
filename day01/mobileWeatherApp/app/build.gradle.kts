@@ -43,7 +43,12 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.car.ui.lib)
     implementation(libs.play.services.location)
+    implementation(libs.androidx.tools.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    val retrofitVersion = "2.11.0"
+    implementation ("com.squareup.retrofit2:retrofit:$retrofitVersion")
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
 }
