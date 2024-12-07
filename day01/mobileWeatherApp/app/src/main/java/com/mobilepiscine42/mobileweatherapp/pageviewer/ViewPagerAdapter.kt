@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp
+package com.mobilepiscine42.mobileweatherapp.pageviewer
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity

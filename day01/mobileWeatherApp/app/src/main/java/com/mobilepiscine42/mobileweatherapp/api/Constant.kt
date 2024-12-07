@@ -1,5 +1,6 @@
 package com.mobilepiscine42.mobileweatherapp.api
 
 object Constant {
-    val apiKey = "YOUR_API_KEY"
+    val apiKey = "288eeda57dc2488c8f1142752240312"
+    val REQUEST_CODE_LOCATION_PERMISSION = 1001
 }

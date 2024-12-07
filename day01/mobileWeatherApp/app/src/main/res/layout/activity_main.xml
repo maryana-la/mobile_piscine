@@ -31,12 +31,13 @@
 
             <ImageButton
                 android:id="@+id/searchGeoButton"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:layout_gravity="end"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Use current location"
                 android:src="@drawable/ic_location_near_foreground"
+                android:onClick="requestLocation"
                 app:tint="#FA6B6666" />
 
         </androidx.appcompat.widget.Toolbar>
@@ -47,7 +48,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"

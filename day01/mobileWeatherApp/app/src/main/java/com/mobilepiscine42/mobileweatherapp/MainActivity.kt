@@ -1,27 +1,36 @@
 package com.mobilepiscine42.mobileweatherapp
 
-import android.location.Location
+import android.content.pm.PackageManager
+import android.location.LocationRequest
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mobilepiscine42.mobileweatherapp.pageviewer.SharedViewModel
+import com.mobilepiscine42.mobileweatherapp.pageviewer.ViewPagerAdapter
+import com.mobilepiscine42.mobileweatherapp.api.Constant
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var currentLocation: Location
     private var FINE_PERMISSION_CODE = 1
-    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
 
+    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
+
+
+    private lateinit var weatherViewModel : WeatherViewModel
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +43,13 @@ class MainActivity : AppCompatActivity() {
         viewPager.adapter = adapter
 
         // implement search of location
-        val weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
+        weatherViewModel= ViewModelProvider(this)[WeatherViewModel::class.java]
+        sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
 
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        weatherViewModel.toastMessage.observe(this) { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        }
 
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -66,30 +78,58 @@ class MainActivity : AppCompatActivity() {
                 query?.let {
                     Log.i ("City name : ", query)
                     displaySearchResult(it)
+                    weatherViewModel.getData(query, sharedViewModel)
                 }
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Optionally handle text changes in real-time
-                // while user is typing
+//                if (newText != null) {
+//                    weatherViewModel.getData(newText)
+//                }
                 return false
             }
         })
-
     }
 
     private fun displaySearchResult(query: String) {
         // Update fragments or views with the search result
-        Toast.makeText(this, "Searching for $query", Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this, "Searching for $query", Toast.LENGTH_SHORT).show()
     }
 
-//    private fun setLocation (view : View) {
-//
-//    }
-//
+    fun getShareViewModel() : SharedViewModel {
+        return sharedViewModel
+    }
 
+    private fun isLocationPermissionGranted(): Boolean {
+        return if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                Constant.REQUEST_CODE_LOCATION_PERMISSION
+            )
+            false
+        } else {
+            true
+        }
+    }
 
+    fun requestLocation(view: View) {
+        isLocationPermissionGranted()
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-
+    }
 }
+
+
+
