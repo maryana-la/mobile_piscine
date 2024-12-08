@@ -35,10 +35,11 @@
                 android:layout_height="48dp"
                 android:layout_gravity="end"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Use current location"
+                android:contentDescription="@string/getCurrentLocation"
                 android:src="@drawable/ic_location_near_foreground"
-                android:onClick="requestLocation"
-                app:tint="#FA6B6666" />
+                app:tint="#FA6B6666"
+                android:onClick="requestLocation" />
+
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

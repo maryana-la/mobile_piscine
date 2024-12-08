@@ -27,7 +27,7 @@ class WeatherViewModel : ViewModel() {
             if (response.isSuccessful) {
                 Log.i ("Respones : ", response.body().toString())
                 _toastMessage.value = "New location $city has been set up"
-                sharedViewModel.setCurrentLocation(city)
+                response.body()?.location?.let { sharedViewModel.setCurrentLocation(it.name) }
             } else {
                 Log.i("Error : ", response.message())
                 _toastMessage.value = "Location $city is not found"
