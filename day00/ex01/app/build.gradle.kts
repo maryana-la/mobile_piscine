@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mobilepiscine42.ex00"
+    namespace = "com.mobilepiscine42.ex01"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mobilepiscine42.ex00"
+        applicationId = "com.mobilepiscine42.ex01"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.mobilepiscine42.ex00
+package com.mobilepiscine42.ex01
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

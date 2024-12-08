@@ -24,7 +24,6 @@ class Weekly : Fragment() {
         val view = inflater.inflate(R.layout.fragment_weekly, container, false)
         val locationText = view?.findViewById<TextView>(R.id.location_text)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-        // Observe location updates
         sharedViewModel.location.observe(viewLifecycleOwner) {
             locationText?.text = sharedViewModel.getCurrentLocation()
         }

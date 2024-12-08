@@ -15,6 +15,6 @@ class ViewPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapte
     }
 
     override fun getItemCount(): Int {
-        return 3 // Number of tabs
+        return 3
     }
 }

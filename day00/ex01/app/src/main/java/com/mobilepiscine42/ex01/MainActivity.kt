@@ -1,16 +1,15 @@
-package com.mobilepiscine42.ex00
+package com.mobilepiscine42.ex01
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
-    val MAIN_LABEL = "Hello World!"
-    val ALT_LABEL = "Cou-Cou :)"
+    private val MAIN_LABEL = "Hello World!"
+    private val ALT_LABEL = "Cou-Cou :)"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +21,6 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             Log.d("Button","Button pressed")
-//            Toast.makeText(this, "Thanks for clicking", Toast.LENGTH_SHORT).show()
 
             if (counter == false) {
                 mainLabel.text = ALT_LABEL

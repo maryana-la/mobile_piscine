@@ -12,7 +12,6 @@ import com.mobilepiscine42.mobileweatherapp.R
 class Currently : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -24,7 +23,6 @@ class Currently : Fragment() {
         val view = inflater.inflate(R.layout.fragment_currently, container, false)
         val locationText = view?.findViewById<TextView>(R.id.location_text)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-        // Observe location updates
         sharedViewModel.location.observe(viewLifecycleOwner) {
             locationText?.text = sharedViewModel.getCurrentLocation()
         }

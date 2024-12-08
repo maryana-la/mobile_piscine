@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         result = findViewById(R.id.line2)
         horizontalScrollView = findViewById(R.id.horizontalScrollView)
 
-        // keep data when changing orientation of device
         if (savedInstanceState != null) {
             input.text = savedInstanceState.getString("INPUT_TEXT", "")
             result.text = savedInstanceState.getString("RESULT_TEXT", "")
@@ -41,7 +40,6 @@ class MainActivity : AppCompatActivity() {
 
         input.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                // Scroll to the end of the HorizontalScrollView
                 horizontalScrollView.post {
                     horizontalScrollView.fullScroll(View.FOCUS_RIGHT)
                 }
@@ -56,7 +54,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        // Save the current state of input and result
         outState.putString("INPUT_TEXT", input.text.toString())
         outState.putString("RESULT_TEXT", result.text.toString())
         outState.putBoolean("CAN_ADD_SIGN", canAddSign)

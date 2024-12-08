@@ -5,10 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class SharedViewModel : ViewModel() {
-//    private lateinit var currentLocation: String
 
     private val currentLocation = MutableLiveData<String>()
-
     val location: LiveData<String> get() = currentLocation
 
     fun setCurrentLocation(city: String) {

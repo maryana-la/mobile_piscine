@@ -1,4 +1,4 @@
-package com.mobilepiscine42.ex00
+package com.mobilepiscine42.ex01
 
 import org.junit.Test
 
