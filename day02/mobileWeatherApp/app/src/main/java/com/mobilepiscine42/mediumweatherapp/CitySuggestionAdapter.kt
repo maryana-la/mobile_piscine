@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class CitySuggestionAdapter(
-    private var suggestions: List<Result>,
+    private var suggestions: List<CitySuggestion>,
     private val onCityClicked: (CitySuggestion) -> Unit
 ) : RecyclerView.Adapter<CitySuggestionAdapter.CityViewHolder>() {
 
@@ -28,7 +28,9 @@ class CitySuggestionAdapter(
         holder.itemView.setOnClickListener { onCityClicked(city) }
     }
 
-    override fun getItemCount(): Int = suggestions.size
+    override fun getItemCount(): Int {
+        return suggestions.size
+    }
 
     class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cityName: TextView = itemView.findViewById(R.id.cityOption)

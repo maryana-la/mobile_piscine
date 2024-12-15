@@ -35,7 +35,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var geocodingViewModel : GeocodingViewModel
     private lateinit var sharedViewModel: SharedViewModel
 
+
     private lateinit var recyclerView: RecyclerView
+    private var cityOptionsFromApi = ArrayList<CitySuggestion>()
     private lateinit var adapter: CitySuggestionAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -99,10 +101,9 @@ class MainActivity : AppCompatActivity() {
     private fun setSearchView() {
         val searchView = findViewById<SearchView>(R.id.searchGeoText)
         recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = CitySuggestionAdapter(emptyList()) { city ->
-            onCitySelected(city)
-        }
+        adapter = CitySuggestionAdapter(emptyList()) { city -> onCitySelected(city) }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
@@ -121,13 +122,23 @@ class MainActivity : AppCompatActivity() {
                 val citySuggestion : List<Result> = geocodingViewModel.getData(newText)
                 if (citySuggestion.isNotEmpty()) {
                     recyclerView.visibility = View.VISIBLE
-                    adapter.updateSuggestions(citySuggestion)
+                    adapter.updateSuggestions(adaptCityList(citySuggestion))
                 } else {
                     recyclerView.visibility = View.GONE
                 }
                 return true
             }
         })
+    }
+
+
+    private fun adaptCityList (fromApi : List<Result>) : List<CitySuggestion> {
+        val returnValue : MutableList<CitySuggestion> = mutableListOf()
+        for (item in fromApi) {
+            val tmp = CitySuggestion(item.name, item.admin1, item.country)
+            returnValue.add(tmp)
+        }
+        return returnValue
     }
 
     private fun onCitySelected(city: CitySuggestion) {
