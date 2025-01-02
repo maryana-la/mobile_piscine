@@ -18,12 +18,12 @@ class WeatherViewModel : ViewModel() {
 
     fun getData (latitude : String, longitude : String, sharedViewModel: SharedViewModel) {
         viewModelScope.launch {
-            val response = weatherApi.getWeather("48.85341", "2.3488", Constant.CURRENT, Constant.HOURLY, Constant.DAILY, Constant.FORECAST_DAYS)
+            val response = weatherApi.getWeather(latitude, longitude, Constant.CURRENT, Constant.HOURLY, Constant.DAILY, Constant.FORECAST_DAYS)
             if (response.isSuccessful) {
                 Log.i ("Respones : ", response.body().toString())
 //                val currentCity = response.body()?.location?.name
-//                _toastMessage.value = "New location $currentCity has been set up"
-//                sharedViewModel.setCurrentLocation(currentCity.toString())
+                _toastMessage.value = "New location latitude: $latitude, longitude: $longitude has been set up"
+                sharedViewModel.setCurrentLocation("$latitude, $longitude")
             } else {
                 Log.i("Error : ", response.message())
                 _toastMessage.value = "Location is not found"

@@ -36,7 +36,7 @@ class CitySuggestionAdapter(
         private val cityName: TextView = itemView.findViewById(R.id.cityOption)
 
         fun bind(city: CitySuggestion) {
-            cityName.text = city.name
+            cityName.text = "${city.name}, ${city.region}, ${city.country}"
         }
     }
 }

@@ -40,6 +40,12 @@ class MainActivity : AppCompatActivity() {
     private var cityOptionsFromApi = ArrayList<CitySuggestion>()
     private lateinit var adapter: CitySuggestionAdapter
 
+    private val citySuggestions = listOf(
+        "Los Angeles", "Chicago", "Houston", "Phoenix",
+        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
+        "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte"
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -119,23 +125,37 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText?.length!! < 3)  { return false }
-                val citySuggestion : List<Result> = geocodingViewModel.getData(newText)
-                if (citySuggestion.isNotEmpty()) {
-                    recyclerView.visibility = View.VISIBLE
-                    adapter.updateSuggestions(adaptCityList(citySuggestion))
-                } else {
-                    recyclerView.visibility = View.GONE
-                }
+
+                recyclerView.visibility = View.VISIBLE
+                adapter.updateSuggestions(adaptCityList(citySuggestions))
                 return true
+
+//                val citySuggestion : List<Result> = geocodingViewModel.getData(newText)
+//
+//                if (citySuggestion.isNotEmpty()) {
+//                    recyclerView.visibility = View.VISIBLE
+//                    adapter.updateSuggestions(adaptCityList(citySuggestion))
+//                } else {
+//                    recyclerView.visibility = View.GONE
+//                }
+//                return true
             }
         })
     }
 
+//    private fun adaptCityList (fromApi : List<Result>) : List<CitySuggestion> {
+//        val returnValue : MutableList<CitySuggestion> = mutableListOf()
+//        for (item in fromApi) {
+//            val tmp = CitySuggestion(item.name, item.admin1, item.country)
+//            returnValue.add(tmp)
+//        }
+//        return returnValue
+//    }
 
-    private fun adaptCityList (fromApi : List<Result>) : List<CitySuggestion> {
+    private fun adaptCityList (fromApi : List<String>) : List<CitySuggestion> {
         val returnValue : MutableList<CitySuggestion> = mutableListOf()
         for (item in fromApi) {
-            val tmp = CitySuggestion(item.name, item.admin1, item.country)
+            val tmp = CitySuggestion(item, item, item)
             returnValue.add(tmp)
         }
         return returnValue
