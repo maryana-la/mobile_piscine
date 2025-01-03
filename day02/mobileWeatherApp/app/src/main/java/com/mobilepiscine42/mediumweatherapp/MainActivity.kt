@@ -33,25 +33,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var locationCallback: LocationCallback
     private lateinit var weatherViewModel : WeatherViewModel
     private lateinit var geocodingViewModel : GeocodingViewModel
-    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var sharedViewModel : SharedViewModel
+    private lateinit var searchView : SearchView
 
 
     private lateinit var recyclerView: RecyclerView
-    private var cityOptionsFromApi = ArrayList<CitySuggestion>()
+    private var cityOptionsFromApi = ArrayList<Result>()
     private lateinit var adapter: CitySuggestionAdapter
 
-    private val citySuggestions = listOf(
-        "Los Angeles", "Chicago", "Houston", "Phoenix",
-        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
-        "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte"
-    )
+//    private val citySuggestions = listOf(
+//        "Los Angeles", "Chicago", "Houston", "Phoenix",
+//        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
+//        "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte"
+//    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setPageView()
         setLocationService()
-//        setSearchView()
+        setSearchView()
         weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
         geocodingViewModel = ViewModelProvider(this)[GeocodingViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
@@ -82,8 +83,6 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
-
-        setSearchView()
     }
 
     private fun setLocationService() {
@@ -107,7 +106,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setSearchView() {
-        val searchView = findViewById<SearchView>(R.id.searchGeoText)
+        searchView = findViewById(R.id.searchGeoText)
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -119,20 +118,33 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     Log.i ("City name : ", query)
-                    weatherViewModel.getData(query, "", sharedViewModel)
-                    query.removeRange(0, query.length)
+                    geocodingViewModel.getData(query, sharedViewModel)
+                    if (sharedViewModel.getCityOptions().isNotEmpty()) {
+                        weatherViewModel.getData(
+                            sharedViewModel.getCityOptions()[0].latitude.toString(),
+                            sharedViewModel.getCityOptions()[0].longitude.toString(),
+                            sharedViewModel
+                        )
+                    }
+                        query.removeRange(0, query.length)
                 }
                 recyclerView.visibility = View.GONE
+                searchView.setQuery("", false)
+                searchView.clearFocus()
                 return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText?.length!! < 3)  { return false }
+                if (newText?.length!! < 3)  {
+                    recyclerView.visibility = RecyclerView.VISIBLE
+                    adapter.updateSuggestions(emptyList())
+                    return false
+                }
                 newText.let { query ->
                     if (query.isNotBlank()) {
                         // Simulate fetching suggestions (replace with API logic)
-                        val suggestions = adaptCityList(citySuggestions)
-                        adapter.updateSuggestions(suggestions)
+                        geocodingViewModel.getData(query, sharedViewModel)
+                        adapter.updateSuggestions(sharedViewModel.getCityOptions())
                         recyclerView.visibility = RecyclerView.VISIBLE
                     } else {
                         recyclerView.visibility = RecyclerView.GONE
@@ -151,25 +163,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-//    private fun adaptCityList (fromApi : List<Result>) : List<CitySuggestion> {
-//        val returnValue : MutableList<CitySuggestion> = mutableListOf()
-//        for (item in fromApi) {
-//            val tmp = CitySuggestion(item.name, item.admin1, item.country)
-//            returnValue.add(tmp)
-//        }
-//        return returnValue
-//    }
-
-    private fun adaptCityList (fromApi : List<String>) : List<CitySuggestion> {
-        val returnValue : MutableList<CitySuggestion> = mutableListOf()
-        for (item in fromApi) {
-            val tmp = CitySuggestion(item, item, item)
-            returnValue.add(tmp)
-        }
-        return returnValue
-    }
-
-    private fun onCitySelected(city: CitySuggestion) {
+    private fun onCitySelected(city: Result) {
+        weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel)
+        searchView.setQuery("", false)
+        searchView.clearFocus()
         recyclerView.visibility = View.GONE
         // Handle city selection (e.g., fetch weather data for this city)
         Log.i("RecycleView","Selected City: ${city.name}")

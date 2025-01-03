@@ -5,15 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.mobilepiscine42.mediumweatherapp.geocoding_api.Result
 
 class CitySuggestionAdapter(
-    private var suggestions: MutableList<CitySuggestion>,
-    private val onCityClicked: (CitySuggestion) -> Unit
+    private var suggestions: List<Result>,
+    private val onCityClicked: (Result) -> Unit
 ) : RecyclerView.Adapter<CitySuggestionAdapter.CityViewHolder>() {
 
-    fun updateSuggestions(newSuggestions: List<CitySuggestion>) {
-        suggestions.clear()
-        suggestions.addAll(newSuggestions)
+    fun updateSuggestions(newSuggestions: List<Result>) {
+        suggestions = newSuggestions
         notifyDataSetChanged()
     }
 
@@ -36,8 +36,8 @@ class CitySuggestionAdapter(
     class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cityName: TextView = itemView.findViewById(R.id.cityOption)
 
-        fun bind(city: CitySuggestion) {
-            cityName.text = "${city.name}, ${city.region}, ${city.country}"
+        fun bind(city: Result) {
+            cityName.text = "${city.name}, ${city.admin1}, ${city.country}"
         }
     }
 }
