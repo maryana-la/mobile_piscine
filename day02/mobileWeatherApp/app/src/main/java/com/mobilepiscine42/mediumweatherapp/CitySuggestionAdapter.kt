@@ -7,12 +7,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class CitySuggestionAdapter(
-    private var suggestions: List<CitySuggestion>,
+    private var suggestions: MutableList<CitySuggestion>,
     private val onCityClicked: (CitySuggestion) -> Unit
 ) : RecyclerView.Adapter<CitySuggestionAdapter.CityViewHolder>() {
 
     fun updateSuggestions(newSuggestions: List<CitySuggestion>) {
-        suggestions = newSuggestions
+        suggestions.clear()
+        suggestions.addAll(newSuggestions)
         notifyDataSetChanged()
     }
 

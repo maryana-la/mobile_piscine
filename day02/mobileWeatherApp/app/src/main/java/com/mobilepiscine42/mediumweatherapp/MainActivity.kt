@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setPageView()
         setLocationService()
-        setSearchView()
+//        setSearchView()
         weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
         geocodingViewModel = ViewModelProvider(this)[GeocodingViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
@@ -82,6 +82,8 @@ class MainActivity : AppCompatActivity() {
             }
             true
         }
+
+        setSearchView()
     }
 
     private fun setLocationService() {
@@ -109,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapter = CitySuggestionAdapter(emptyList()) { city -> onCitySelected(city) }
+        adapter = CitySuggestionAdapter(mutableListOf()) { city -> onCitySelected(city) }
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
@@ -118,6 +120,7 @@ class MainActivity : AppCompatActivity() {
                 query?.let {
                     Log.i ("City name : ", query)
                     weatherViewModel.getData(query, "", sharedViewModel)
+                    query.removeRange(0, query.length)
                 }
                 recyclerView.visibility = View.GONE
                 return false
@@ -125,22 +128,27 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText?.length!! < 3)  { return false }
-
-                recyclerView.visibility = View.VISIBLE
-                adapter.updateSuggestions(adaptCityList(citySuggestions))
+                newText.let { query ->
+                    if (query.isNotBlank()) {
+                        // Simulate fetching suggestions (replace with API logic)
+                        val suggestions = adaptCityList(citySuggestions)
+                        adapter.updateSuggestions(suggestions)
+                        recyclerView.visibility = RecyclerView.VISIBLE
+                    } else {
+                        recyclerView.visibility = RecyclerView.GONE
+                    }
+                }
                 return true
-
-//                val citySuggestion : List<Result> = geocodingViewModel.getData(newText)
-//
-//                if (citySuggestion.isNotEmpty()) {
-//                    recyclerView.visibility = View.VISIBLE
-//                    adapter.updateSuggestions(adaptCityList(citySuggestion))
-//                } else {
-//                    recyclerView.visibility = View.GONE
-//                }
-//                return true
             }
+
         })
+
+        searchView.setOnCloseListener {
+            adapter.updateSuggestions(emptyList())
+            recyclerView.visibility = RecyclerView.GONE
+            true
+        }
+
     }
 
 //    private fun adaptCityList (fromApi : List<Result>) : List<CitySuggestion> {
@@ -164,7 +172,8 @@ class MainActivity : AppCompatActivity() {
     private fun onCitySelected(city: CitySuggestion) {
         recyclerView.visibility = View.GONE
         // Handle city selection (e.g., fetch weather data for this city)
-        println("Selected City: ${city.name}")
+        Log.i("RecycleView","Selected City: ${city.name}")
+        Toast.makeText(this, "Selected City: ${city.name}", Toast.LENGTH_SHORT).show()
     }
 
 
