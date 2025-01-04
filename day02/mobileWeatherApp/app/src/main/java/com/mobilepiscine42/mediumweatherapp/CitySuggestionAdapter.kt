@@ -37,7 +37,8 @@ class CitySuggestionAdapter(
         private val cityName: TextView = itemView.findViewById(R.id.cityOption)
 
         fun bind(city: Result) {
-            cityName.text = "${city.name}, ${city.admin1}, ${city.country}"
+            cityName.text = listOfNotNull(city.name, city.admin1, city.country)
+                .joinToString(separator = ", ")
         }
     }
 }

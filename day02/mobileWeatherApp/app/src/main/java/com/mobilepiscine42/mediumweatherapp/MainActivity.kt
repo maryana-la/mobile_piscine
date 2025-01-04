@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -18,6 +19,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
@@ -38,14 +40,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var recyclerView: RecyclerView
-    private var cityOptionsFromApi = ArrayList<Result>()
     private lateinit var adapter: CitySuggestionAdapter
-
-//    private val citySuggestions = listOf(
-//        "Los Angeles", "Chicago", "Houston", "Phoenix",
-//        "Philadelphia", "San Antonio", "San Diego", "Dallas", "San Jose",
-//        "Austin", "Jacksonville", "Fort Worth", "Columbus", "Charlotte"
-//    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,6 +120,7 @@ class MainActivity : AppCompatActivity() {
                             sharedViewModel.getCityOptions()[0].longitude.toString(),
                             sharedViewModel
                         )
+                        sharedViewModel.setCurrentCity(sharedViewModel.getCityOptions()[0])
                     }
                         query.removeRange(0, query.length)
                 }
@@ -152,7 +148,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 return true
             }
-
         })
 
         searchView.setOnCloseListener {
@@ -165,10 +160,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun onCitySelected(city: Result) {
         weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel)
+        sharedViewModel.setCurrentCity(city)
         searchView.setQuery("", false)
         searchView.clearFocus()
         recyclerView.visibility = View.GONE
-        // Handle city selection (e.g., fetch weather data for this city)
         Log.i("RecycleView","Selected City: ${city.name}")
         Toast.makeText(this, "Selected City: ${city.name}", Toast.LENGTH_SHORT).show()
     }
@@ -183,7 +178,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
-        val task: Task<Location> = fusedLocationProviderClient.lastLocation
+        val task: Task<Location> = fusedLocationProviderClient.
+            getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
         task.addOnSuccessListener { location ->
             if (location != null) {
                 val latitude = location.latitude.toString()

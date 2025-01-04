@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.mediumweatherapp.R
+import java.math.BigDecimal
 
 class Currently : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -21,10 +22,26 @@ class Currently : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_currently, container, false)
-        val locationText = view?.findViewById<TextView>(R.id.location_text)
+        val city = view?.findViewById<TextView>(R.id.city)
+        val region = view?.findViewById<TextView>(R.id.region)
+        val country = view?.findViewById<TextView>(R.id.country)
+        val temperature = view?.findViewById<TextView>(R.id.temperature)
+        val wind = view?.findViewById<TextView>(R.id.wind)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-        sharedViewModel.location.observe(viewLifecycleOwner) {
-            locationText?.text = sharedViewModel.getCurrentLocation()
+
+        sharedViewModel.cityLiveData.observe(viewLifecycleOwner) {
+            city?.text = sharedViewModel.getCurrentCity().name
+            region?.text = sharedViewModel.getCurrentCity().admin1
+            country?.text = sharedViewModel.getCurrentCity().country
+        }
+
+        sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
+            temperature?.text = sharedViewModel.getWeatherForecast().current.temperature_2m.toString() +
+                sharedViewModel.getWeatherForecast().current_units.temperature_2m
+            wind?.text = sharedViewModel.getWeatherForecast().current.wind_speed_10m.toString() +
+                    sharedViewModel.getWeatherForecast().current_units.wind_speed_10m + " " +
+                    Util.getWindDirection(sharedViewModel.getWeatherForecast().current.wind_direction_10m)
+
         }
         return view
     }
