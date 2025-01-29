@@ -1,12 +1,15 @@
 package com.mobilepiscine42.mediumweatherapp.pageviewer
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.mediumweatherapp.R
 import com.mobilepiscine42.mediumweatherapp.api.Hourly
@@ -19,14 +22,14 @@ class Today : Fragment() {
         super.onCreate(savedInstanceState)
     }
 
-
-    //TODO add scrolling
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_today, container, false)
+        val innerLayout = view?.findViewById<LinearLayout>(R.id.innerLayout)
         val mainLayout = view?.findViewById<LinearLayout>(R.id.mainLayout)
+        val scrollView = view?.findViewById<ScrollView>(R.id.scrollView)
         val city = view?.findViewById<TextView>(R.id.city)
         val region = view?.findViewById<TextView>(R.id.region)
         val country = view?.findViewById<TextView>(R.id.country)
@@ -41,8 +44,9 @@ class Today : Fragment() {
 
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
             val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
+            innerLayout?.removeAllViewsInLayout()
 
-            for (i in 0 until 23) {
+            for (i in 0 until 24) {
                 val linePerHour = LinearLayout(requireContext()).apply {
                     orientation = LinearLayout.HORIZONTAL
                 }
@@ -58,10 +62,25 @@ class Today : Fragment() {
                 linePerHour.addView(timeStamp)
                 linePerHour.addView(temperatureHour)
                 linePerHour.addView(windHour)
-                mainLayout?.addView(linePerHour)
+                innerLayout?.addView(linePerHour)
+
             }
         }
 
+
+        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
+            val errorMessage = TextView(context).apply {
+                text = sharedViewModel.getErrorMsg()
+                textSize = 40f
+                setTextColor(156)
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    3f)
+            }
+            mainLayout?.addView(errorMessage)
+        }
         return view
     }
 

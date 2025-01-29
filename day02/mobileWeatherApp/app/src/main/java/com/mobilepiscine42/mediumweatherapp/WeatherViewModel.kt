@@ -29,7 +29,7 @@ class WeatherViewModel : ViewModel() {
                 _toastMessage.value = "New location latitude: $latitude, longitude: $longitude has been set up"
             } else {
                 Log.i("Error : ", response.message())
-                _toastMessage.value = "Location is not found"
+                sharedViewModel.setErrorMsg("Location is not found")
             }
         }
     }

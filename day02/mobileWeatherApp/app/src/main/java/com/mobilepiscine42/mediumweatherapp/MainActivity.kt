@@ -121,8 +121,11 @@ class MainActivity : AppCompatActivity() {
                             sharedViewModel
                         )
                         sharedViewModel.setCurrentCity(sharedViewModel.getCityOptions()[0])
+                    } else {
+                        sharedViewModel.setErrorMsg("Connection failure.")
                     }
-                        query.removeRange(0, query.length)
+                    query.removeRange(0, query.length)
+                        //TODO : add erorr - no network
                 }
                 recyclerView.visibility = View.GONE
                 searchView.setQuery("", false)
@@ -173,7 +176,7 @@ class MainActivity : AppCompatActivity() {
     fun requestLocation(view: View) {
         if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (!isLocationPermissionGranted()) {
-                Toast.makeText(this, "GeoLocation is not available. Please enable GPS in the settings.", Toast.LENGTH_SHORT).show()
+                sharedViewModel.setErrorMsg("GeoLocation is not available. Please enable GPS in the settings.")
             }
         }
 
@@ -187,10 +190,11 @@ class MainActivity : AppCompatActivity() {
                 weatherViewModel.getData(latitude, longitude, sharedViewModel)
                 Log.d("Location", "Lat: $latitude, Lon: $longitude")
             } else {
-                Toast.makeText(this, "Location not available", Toast.LENGTH_SHORT).show()
+                sharedViewModel.setErrorMsg("Network error.")
             }
         }.addOnFailureListener { e ->
             Log.e("Location", "Error fetching location", e)
+            sharedViewModel.setErrorMsg("Error fetching location.")
         }
     }
 

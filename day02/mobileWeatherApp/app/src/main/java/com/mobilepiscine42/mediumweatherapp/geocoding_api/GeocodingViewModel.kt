@@ -13,6 +13,7 @@ class GeocodingViewModel : ViewModel() {
 
     private val geocodingApi = RetrofitInstance.geocodingApi
 
+    //TODO check if internet connection is available
     fun getData(city : String, sharedViewModel: SharedViewModel) {
         viewModelScope.launch {
             val response = geocodingApi.getLocationList(city, Constant.NUMBER_OF_SEARCH_RESULT)

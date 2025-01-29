@@ -10,16 +10,17 @@ import com.mobilepiscine42.mediumweatherapp.geocoding_api.Result
 
 class SharedViewModel : ViewModel() {
 
-//    private val currentLocation = MutableLiveData<String>()
-//    val location: LiveData<String> get() = currentLocation
-
     private var cityOptions : MutableList<Result> = mutableListOf()
-
     private var weatherForecast = MutableLiveData<WeatherModel>()
-    val forecastLiveData: LiveData<WeatherModel> get() = weatherForecast
 
+    val forecastLiveData: LiveData<WeatherModel> get() = weatherForecast
     private var currentCity = MutableLiveData<Result>()
     val cityLiveData: LiveData<Result> get() = currentCity
+
+
+    val errorLiveData: LiveData<String> get() = errorMsg
+    private var errorMsg = MutableLiveData<String>()
+
 
     fun setCityOptions(fromAPI : List<Result>) {
         cityOptions.clear()
@@ -44,6 +45,14 @@ class SharedViewModel : ViewModel() {
 
     fun getCurrentCity() : Result {
         return currentCity.value!!
+    }
+
+    fun setErrorMsg(message : String) {
+        errorMsg.value = message
+    }
+
+    fun getErrorMsg() : String {
+        return errorMsg.value!!
     }
 
 }

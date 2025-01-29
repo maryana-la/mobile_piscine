@@ -24,6 +24,7 @@ class Weekly : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_weekly, container, false)
         val mainLinearLayout = view.findViewById<LinearLayout>(R.id.mainLinearLayout)
+        val innerLayout = view.findViewById<LinearLayout>(R.id.innerLayout)
         val city = view?.findViewById<TextView>(R.id.city)
         val region = view?.findViewById<TextView>(R.id.region)
         val country = view?.findViewById<TextView>(R.id.country)
@@ -39,6 +40,7 @@ class Weekly : Fragment() {
 
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
             val dailyForecast = sharedViewModel.getWeatherForecast().daily
+            innerLayout.removeAllViewsInLayout()
 
             for (i in 0 until 7) {
                 val linePerDay = LinearLayout(requireContext()).apply {
@@ -59,7 +61,7 @@ class Weekly : Fragment() {
                 linePerDay.addView(tempDayMin)
                 linePerDay.addView(tempDayMax)
                 linePerDay.addView(weatherDescription)
-                mainLinearLayout.addView(linePerDay)
+                innerLayout.addView(linePerDay)
             }
         }
 
