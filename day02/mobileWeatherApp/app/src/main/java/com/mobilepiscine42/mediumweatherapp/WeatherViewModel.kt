@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mobilepiscine42.mediumweatherapp.api.Constant
 import kotlinx.coroutines.launch
 import com.mobilepiscine42.mediumweatherapp.api.RetrofitInstance
 import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
+import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.ReverseGeoViewModel
 
 class WeatherViewModel : ViewModel() {
 
@@ -16,7 +18,8 @@ class WeatherViewModel : ViewModel() {
     private val _toastMessage = MutableLiveData<String>()
     val toastMessage: LiveData<String> get() = _toastMessage
 
-    fun getData (latitude : String, longitude : String, sharedViewModel: SharedViewModel) {
+    fun getData (latitude : String, longitude : String, sharedViewModel: SharedViewModel, reverseGeoViewModel: ReverseGeoViewModel) {
+        reverseGeoViewModel.getData(latitude, longitude, sharedViewModel)
         viewModelScope.launch {
             val response = weatherApi.getWeather(latitude, longitude, Constant.CURRENT, Constant.HOURLY, Constant.DAILY, Constant.FORECAST_DAYS)
             if (response.isSuccessful) {

@@ -2,13 +2,14 @@ package com.mobilepiscine42.mediumweatherapp
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.SearchView
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -16,25 +17,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.*
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
-import com.mobilepiscine42.mediumweatherapp.pageviewer.ViewPagerAdapter
 import com.mobilepiscine42.mediumweatherapp.api.Constant
 import com.mobilepiscine42.mediumweatherapp.geocoding_api.GeocodingViewModel
 import com.mobilepiscine42.mediumweatherapp.geocoding_api.Result
+import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
+import com.mobilepiscine42.mediumweatherapp.pageviewer.ViewPagerAdapter
+import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.ReverseGeoViewModel
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
-    private lateinit var locationRequest: LocationRequest
-    private lateinit var locationCallback: LocationCallback
+//    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
+//    private lateinit var locationRequest: LocationRequest
+//    private lateinit var locationCallback: LocationCallback
+    private lateinit var locationManager: LocationManager
     private lateinit var weatherViewModel : WeatherViewModel
     private lateinit var geocodingViewModel : GeocodingViewModel
+    private lateinit var reverseGeoViewModel : ReverseGeoViewModel
     private lateinit var sharedViewModel : SharedViewModel
     private lateinit var searchView : SearchView
 
@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
         geocodingViewModel = ViewModelProvider(this)[GeocodingViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
+        reverseGeoViewModel = ViewModelProvider(this)[ReverseGeoViewModel::class.java]
         weatherViewModel.toastMessage.observe(this) { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
@@ -79,25 +80,8 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
-
     private fun setLocationService() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
-        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 50000)
-            .setWaitForAccurateLocation(false)
-            .setMinUpdateIntervalMillis(2000)
-            .setMaxUpdateDelayMillis(5000)
-            .build()
-
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
-                for (location in locationResult.locations) {
-                    val latitude = location.latitude
-                    val longitude = location.longitude
-                    Log.d("Location Update", "Lat: $latitude, Lon: $longitude")
-                }
-            }
-        }
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     private fun setSearchView() {
@@ -118,9 +102,9 @@ class MainActivity : AppCompatActivity() {
                         weatherViewModel.getData(
                             sharedViewModel.getCityOptions()[0].latitude.toString(),
                             sharedViewModel.getCityOptions()[0].longitude.toString(),
-                            sharedViewModel
+                            sharedViewModel,
+                            reverseGeoViewModel
                         )
-                        sharedViewModel.setCurrentCity(sharedViewModel.getCityOptions()[0])
                     } else {
                         sharedViewModel.setErrorMsg("Connection failure.")
                     }
@@ -141,7 +125,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 newText.let { query ->
                     if (query.isNotBlank()) {
-                        // Simulate fetching suggestions (replace with API logic)
                         geocodingViewModel.getData(query, sharedViewModel)
                         adapter.updateSuggestions(sharedViewModel.getCityOptions())
                         recyclerView.visibility = RecyclerView.VISIBLE
@@ -162,15 +145,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onCitySelected(city: Result) {
-        weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel)
-        sharedViewModel.setCurrentCity(city)
+        weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel, reverseGeoViewModel)
         searchView.setQuery("", false)
         searchView.clearFocus()
         recyclerView.visibility = View.GONE
         Log.i("RecycleView","Selected City: ${city.name}")
         Toast.makeText(this, "Selected City: ${city.name}", Toast.LENGTH_SHORT).show()
     }
-
 
 
     fun requestLocation(view: View) {
@@ -180,23 +161,55 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
-        val task: Task<Location> = fusedLocationProviderClient.
-            getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
-        task.addOnSuccessListener { location ->
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.e("GPS", "GPS is disabled! Please enable it in settings.")
+            sharedViewModel.setErrorMsg("GPS is disabled! Please enable it in settings.")
+            return
+        }
+
+        locationManager.getCurrentLocation(
+            LocationManager.GPS_PROVIDER,
+            null,
+            mainExecutor
+        ) { location: Location? ->
             if (location != null) {
                 val latitude = location.latitude.toString()
                 val longitude = location.longitude.toString()
-                weatherViewModel.getData(latitude, longitude, sharedViewModel)
-                Log.d("Location", "Lat: $latitude, Lon: $longitude")
+                weatherViewModel.getData(latitude, longitude, sharedViewModel, reverseGeoViewModel)
+                Log.d("GPS", "latitude: $latitude, longitude: $longitude")
             } else {
+                Log.e("GPS", "Error getting GPS location!")
                 sharedViewModel.setErrorMsg("Network error.")
             }
-        }.addOnFailureListener { e ->
-            Log.e("Location", "Error fetching location", e)
-            sharedViewModel.setErrorMsg("Error fetching location.")
         }
     }
+
+//    fun requestLocation(view: View) {
+//        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            if (!isLocationPermissionGranted()) {
+//                sharedViewModel.setErrorMsg("GeoLocation is not available. Please enable GPS in the settings.")
+//            }
+//        }
+//
+//        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+//        val task: Task<Location> = fusedLocationProviderClient.
+//            getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
+//        task.addOnSuccessListener { location ->
+//            if (location != null) {
+//                val latitude = location.latitude.toString()
+//                val longitude = location.longitude.toString()
+//                weatherViewModel.getData(latitude, longitude, sharedViewModel)
+//                Log.d("Location", "Lat: $latitude, Lon: $longitude")
+//            } else {
+//                sharedViewModel.setErrorMsg("Network error.")
+//            }
+//        }.addOnFailureListener { e ->
+//            Log.e("Location", "Error fetching location", e)
+//            sharedViewModel.setErrorMsg("Error fetching location.")
+//        }
+//    }
+
+
 
     private fun isLocationPermissionGranted(): Boolean {
         return if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
@@ -209,10 +222,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+//    }
 }
 
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.mobilepiscine42.mediumweatherapp.api.WeatherModel
 import com.mobilepiscine42.mediumweatherapp.geocoding_api.Result
-
+import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.Address
 
 
 class SharedViewModel : ViewModel() {
@@ -14,8 +14,8 @@ class SharedViewModel : ViewModel() {
     private var weatherForecast = MutableLiveData<WeatherModel>()
 
     val forecastLiveData: LiveData<WeatherModel> get() = weatherForecast
-    private var currentCity = MutableLiveData<Result>()
-    val cityLiveData: LiveData<Result> get() = currentCity
+    private var currentCity = MutableLiveData<Address>()
+    val cityLiveData: LiveData<Address> get() = currentCity
 
 
     val errorLiveData: LiveData<String> get() = errorMsg
@@ -39,11 +39,11 @@ class SharedViewModel : ViewModel() {
         return weatherForecast.value!!
     }
 
-    fun setCurrentCity (city : Result) {
+    fun setCurrentCity (city : Address) {
         currentCity.value = city
     }
 
-    fun getCurrentCity() : Result {
+    fun getCurrentCity() : Address {
         return currentCity.value!!
     }
 

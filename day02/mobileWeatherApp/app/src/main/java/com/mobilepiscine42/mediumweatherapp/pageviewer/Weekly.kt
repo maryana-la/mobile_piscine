@@ -32,9 +32,9 @@ class Weekly : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
         sharedViewModel.cityLiveData.observe(viewLifecycleOwner) {
-            city?.text = sharedViewModel.getCurrentCity().name
-            region?.text = sharedViewModel.getCurrentCity().admin1
-            country?.text = sharedViewModel.getCurrentCity().country
+            city?.text = sharedViewModel.getCurrentCity().City
+            region?.text = sharedViewModel.getCurrentCity().Region
+            country?.text = sharedViewModel.getCurrentCity().CntryName
         }
 
 

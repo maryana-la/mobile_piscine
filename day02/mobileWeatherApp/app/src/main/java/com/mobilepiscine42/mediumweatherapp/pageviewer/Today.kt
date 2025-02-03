@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.mediumweatherapp.R
 import com.mobilepiscine42.mediumweatherapp.api.Hourly
+import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.Address
 
 class Today : Fragment() {
 
@@ -36,9 +37,9 @@ class Today : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
         sharedViewModel.cityLiveData.observe(viewLifecycleOwner) {
-            city?.text = sharedViewModel.getCurrentCity().name
-            region?.text = sharedViewModel.getCurrentCity().admin1
-            country?.text = sharedViewModel.getCurrentCity().country
+            city?.text = sharedViewModel.getCurrentCity().City
+            region?.text = sharedViewModel.getCurrentCity().Region
+            country?.text = sharedViewModel.getCurrentCity().CntryName
         }
 
 
