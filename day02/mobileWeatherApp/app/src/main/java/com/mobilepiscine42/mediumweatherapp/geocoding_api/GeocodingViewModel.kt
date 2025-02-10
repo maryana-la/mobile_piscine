@@ -8,21 +8,35 @@ import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import java.io.IOException
 
 class GeocodingViewModel : ViewModel() {
 
     private val geocodingApi = RetrofitInstance.geocodingApi
 
-    //TODO check if internet connection is available
+
     fun getData(city : String, sharedViewModel: SharedViewModel) {
         viewModelScope.launch {
-            val response = geocodingApi.getLocationList(city, Constant.NUMBER_OF_SEARCH_RESULT)
-            if (response.isSuccessful) {
-                Log.i("Success", "List of cities received")
-                sharedViewModel.setCityOptions(response.body()?.results ?: emptyList())
-            } else {
-                Log.i("Error : ", response.message())
-                sharedViewModel.setCityOptions(emptyList())
+            try {
+                val response = geocodingApi.getLocationList(city, Constant.NUMBER_OF_SEARCH_RESULT)
+                if (response.body()?.results != null) {
+                    Log.i("Success", response.body().toString())
+                    sharedViewModel.setCityOptions(response.body()?.results ?: emptyList())
+                } else {
+                    Log.i("Error : ", response.message())
+                    sharedViewModel.setCityOptions(emptyList())
+                    sharedViewModel.setErrorMsg("10. Could not find any result for the provided address or coordinates")
+                }
+            } catch (e : IOException) {
+                Log.e("Network", "No internet connection", e)
+                sharedViewModel.setErrorMsg("4.No internet connection. Please check your network and try again.")
+            } catch (e : HttpException) {
+                Log.e ("API error", "HTTP: ${e.message()}", e)
+                sharedViewModel.setErrorMsg("5.Error fetching weather data. Please try again later.")
+            } catch (e : Exception) {
+                Log.e ("WeatherViewModel", "Unexpected error: ${e.message}", e)
+                sharedViewModel.setErrorMsg("6.Unexpected error has happened. Please try again later.")
             }
         }
     }

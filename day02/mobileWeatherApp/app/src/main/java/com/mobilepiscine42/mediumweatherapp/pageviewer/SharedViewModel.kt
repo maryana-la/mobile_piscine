@@ -10,25 +10,25 @@ import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.Address
 
 class SharedViewModel : ViewModel() {
 
-    private var cityOptions : MutableList<Result> = mutableListOf()
-    private var weatherForecast = MutableLiveData<WeatherModel>()
+    val cityOptionsLiveData: LiveData<List<Result>> get() = cityOptions
+    private var cityOptions = MutableLiveData<List<Result>>()
 
     val forecastLiveData: LiveData<WeatherModel> get() = weatherForecast
-    private var currentCity = MutableLiveData<Address>()
-    val cityLiveData: LiveData<Address> get() = currentCity
+    private var weatherForecast = MutableLiveData<WeatherModel>()
 
+    val cityLiveData: LiveData<Address> get() = currentCity
+    private var currentCity = MutableLiveData<Address>()
 
     val errorLiveData: LiveData<String> get() = errorMsg
     private var errorMsg = MutableLiveData<String>()
 
 
     fun setCityOptions(fromAPI : List<Result>) {
-        cityOptions.clear()
-        cityOptions.addAll(fromAPI)
+        cityOptions.value = fromAPI
     }
 
     fun getCityOptions() : List<Result> {
-        return cityOptions.toList()
+        return cityOptions.value!!
     }
 
     fun setWeatherForecast(forecast : WeatherModel) {

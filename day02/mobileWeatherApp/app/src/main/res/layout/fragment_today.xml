@@ -36,10 +36,19 @@
         android:textAlignment="center"
         android:textSize="20sp" />
 
+<!--    <TextView-->
+<!--        android:id="@+id/errorMessage"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:textAlignment="center"-->
+<!--        android:textSize="20sp" />-->
+
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:paddingBottom="100dp">
 
         <LinearLayout
             android:id="@+id/innerLayout"

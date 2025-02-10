@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.mediumweatherapp.R
-import java.math.BigDecimal
 
 class Currently : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel

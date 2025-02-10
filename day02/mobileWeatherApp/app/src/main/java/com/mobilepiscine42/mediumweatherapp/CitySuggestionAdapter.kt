@@ -1,5 +1,6 @@
 package com.mobilepiscine42.mediumweatherapp
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ class CitySuggestionAdapter(
     private val onCityClicked: (Result) -> Unit
 ) : RecyclerView.Adapter<CitySuggestionAdapter.CityViewHolder>() {
 
+    @SuppressLint("NotifyDataSetChanged")
     fun updateSuggestions(newSuggestions: List<Result>) {
         suggestions = newSuggestions
         notifyDataSetChanged()

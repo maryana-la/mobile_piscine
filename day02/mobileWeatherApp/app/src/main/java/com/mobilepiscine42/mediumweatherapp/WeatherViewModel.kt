@@ -11,28 +11,48 @@ import kotlinx.coroutines.launch
 import com.mobilepiscine42.mediumweatherapp.api.RetrofitInstance
 import com.mobilepiscine42.mediumweatherapp.pageviewer.SharedViewModel
 import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.ReverseGeoViewModel
+import retrofit2.HttpException
+import java.io.IOException
 
 class WeatherViewModel : ViewModel() {
 
     private val weatherApi = RetrofitInstance.weatherApi
     private val _toastMessage = MutableLiveData<String>()
-    val toastMessage: LiveData<String> get() = _toastMessage
+//    val toastMessage: LiveData<String> get() = _toastMessage
 
     fun getData (latitude : String, longitude : String, sharedViewModel: SharedViewModel, reverseGeoViewModel: ReverseGeoViewModel) {
-        reverseGeoViewModel.getData(latitude, longitude, sharedViewModel)
         viewModelScope.launch {
-            val response = weatherApi.getWeather(latitude, longitude, Constant.CURRENT, Constant.HOURLY, Constant.DAILY, Constant.FORECAST_DAYS)
-            if (response.isSuccessful) {
-                Log.i ("Respones : ", response.body().toString())
-                val forecast = response.body()
-//                sharedViewModel.setCurrentLocation("$latitude, $longitude")
-                if (forecast != null) {
-                    sharedViewModel.setWeatherForecast(forecast)
+            try {
+                val response = weatherApi.getWeather(
+                    latitude,
+                    longitude,
+                    Constant.CURRENT,
+                    Constant.HOURLY,
+                    Constant.DAILY,
+                    Constant.FORECAST_DAYS
+                )
+                if (response.isSuccessful) {
+                    Log.i("Respones : ", response.body().toString())
+                    val forecast = response.body()
+                    if (forecast != null) {
+                        reverseGeoViewModel.getData(latitude, longitude, sharedViewModel)
+                        sharedViewModel.setWeatherForecast(forecast)
+                    }
+//                    _toastMessage.value =
+//                        "New location latitude: $latitude, longitude: $longitude has been set up"
+                } else {
+                    Log.i("Error1 : ", response.message())
+                    sharedViewModel.setErrorMsg("Location is not found")
                 }
-                _toastMessage.value = "New location latitude: $latitude, longitude: $longitude has been set up"
-            } else {
-                Log.i("Error : ", response.message())
-                sharedViewModel.setErrorMsg("Location is not found")
+            } catch ( e : IOException) {
+                Log.e("Network", "No internet connection", e)
+                sharedViewModel.setErrorMsg("1.No internet connection. Please check your network and try again.")
+            } catch (e : HttpException) {
+                Log.e ("API error", "HTTP: ${e.message()}", e)
+                sharedViewModel.setErrorMsg("2.Error fetching weather data. Please try again later.")
+            } catch (e : Exception) {
+                Log.e ("WeatherViewModel", "Unexpected error: ${e.message}", e)
+                sharedViewModel.setErrorMsg("3.Unexpected error has happened. Please try again later.")
             }
         }
     }

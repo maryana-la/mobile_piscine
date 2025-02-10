@@ -18,28 +18,37 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize">
 
-            <SearchView
-                android:id="@+id/searchGeoText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_toStartOf="@+id/search_geo_button"
-                android:queryHint="Search location..."
-                app:iconifiedByDefault="false" />
-<!--            app:iconifiedByDefault: If false, the search field is always expanded.-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <ImageButton
-                android:id="@+id/searchGeoButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="end"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/getCurrentLocation"
-                android:src="@drawable/ic_location_near_foreground"
-                app:tint="#FA6B6666"
-                android:onClick="requestLocation" />
+                <SearchView
+                    android:id="@+id/searchGeoText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:queryHint="Search location..."
+                    app:iconifiedByDefault="false" />
+<!--                app:iconifiedByDefault: If false, the search field is always expanded.-->
 
+                <!--                    android:layout_alignParentStart="true"-->
+                <!--                    android:layout_alignParentTop="true"-->
+                <!--                    android:layout_toStartOf="@+id/search_geo_button"-->
+
+                <ImageButton
+                    android:id="@+id/searchGeoButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="end"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/getCurrentLocation"
+                    android:src="@drawable/ic_location_near_foreground"
+                    app:tint="#FA6B6666"
+                    android:onClick="requestLocation" />
+
+            </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -48,26 +57,25 @@
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout" >
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationView"
+        app:layout_constraintTop_toBottomOf="@id/appBarLayout">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager2"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             android:layout_marginTop="?attr/actionBarSize" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:layout_marginTop="?attr/actionBarSize"
             android:background="@color/white"
             android:clipToPadding="false"
             android:scrollbars="vertical"
-            android:visibility="gone"
-            android:layout_gravity="top"
-            android:layout_marginTop="?attr/actionBarSize" />
+            android:visibility="gone" />
     </FrameLayout>
 
 
@@ -78,7 +86,9 @@
         android:layout_gravity="bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+

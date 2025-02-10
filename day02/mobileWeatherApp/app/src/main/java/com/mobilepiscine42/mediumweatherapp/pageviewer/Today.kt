@@ -1,7 +1,9 @@
 package com.mobilepiscine42.mediumweatherapp.pageviewer
 
-import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +11,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.mediumweatherapp.R
 import com.mobilepiscine42.mediumweatherapp.api.Hourly
-import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.Address
 
 class Today : Fragment() {
 
@@ -34,6 +34,7 @@ class Today : Fragment() {
         val city = view?.findViewById<TextView>(R.id.city)
         val region = view?.findViewById<TextView>(R.id.region)
         val country = view?.findViewById<TextView>(R.id.country)
+        val errorMessage = TextView(context)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
         sharedViewModel.cityLiveData.observe(viewLifecycleOwner) {
@@ -42,10 +43,11 @@ class Today : Fragment() {
             country?.text = sharedViewModel.getCurrentCity().CntryName
         }
 
-
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
             val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
+            mainLayout?.removeView(errorMessage)
             innerLayout?.removeAllViewsInLayout()
+
 
             for (i in 0 until 24) {
                 val linePerHour = LinearLayout(requireContext()).apply {
@@ -58,30 +60,45 @@ class Today : Fragment() {
                     requireContext())
                 val windHour = Util.setTextViewForFragments(hourlyForecast.wind_speed_10m[i].toString() +
                             sharedViewModel.getWeatherForecast().hourly_units.wind_speed_10m + " " +
-                            Util.getWindDirection(hourlyForecast.wind_direction_10m[i]),
-                    requireContext())
+                            Util.getWindDirection(hourlyForecast.wind_direction_10m[i]), requireContext()
+                    ).apply { layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f) }
                 linePerHour.addView(timeStamp)
                 linePerHour.addView(temperatureHour)
                 linePerHour.addView(windHour)
                 innerLayout?.addView(linePerHour)
-
             }
         }
 
 
-        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
-            val errorMessage = TextView(context).apply {
-                text = sharedViewModel.getErrorMsg()
-                textSize = 40f
-                setTextColor(156)
-                textAlignment = View.TEXT_ALIGNMENT_CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    3f)
-            }
-            mainLayout?.addView(errorMessage)
-        }
+//        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
+//            Log.e("Error message", "inside")
+//            city?.text = ""
+//            region?.text = ""
+//            country?.text = ""
+//            mainLayout?.removeView(errorMessage)
+//
+//            innerLayout?.removeAllViewsInLayout()
+//            errorMessage.apply {
+//                text = sharedViewModel.getErrorMsg()
+//                setTextColor(Color.RED)
+//                textAlignment = View.TEXT_ALIGNMENT_CENTER
+//                textSize = 20f
+//                maxLines = 3
+//                ellipsize = TextUtils.TruncateAt.END
+//                setLineSpacing(4f, 1.2f)
+//                layoutParams = ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.WRAP_CONTENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//            }
+//            mainLayout?.post {
+//                mainLayout.addView(errorMessage)
+//            }
+////            mainLayout?.invalidate()
+////            mainLayout?.visibility = View.VISIBLE
+////            errorMessage.visibility = View.VISIBLE
+//
+//        }
         return view
     }
 

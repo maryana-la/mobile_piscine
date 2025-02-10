@@ -2,6 +2,7 @@ package com.mobilepiscine42.mediumweatherapp
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -11,8 +12,10 @@ import android.util.Log
 import android.view.View
 import android.widget.SearchView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,17 +31,12 @@ import com.mobilepiscine42.mediumweatherapp.reverse_geocoding_api.ReverseGeoView
 
 class MainActivity : AppCompatActivity() {
 
-//    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
-//    private lateinit var locationRequest: LocationRequest
-//    private lateinit var locationCallback: LocationCallback
     private lateinit var locationManager: LocationManager
     private lateinit var weatherViewModel : WeatherViewModel
     private lateinit var geocodingViewModel : GeocodingViewModel
     private lateinit var reverseGeoViewModel : ReverseGeoViewModel
     private lateinit var sharedViewModel : SharedViewModel
     private lateinit var searchView : SearchView
-
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: CitySuggestionAdapter
 
@@ -52,10 +50,18 @@ class MainActivity : AppCompatActivity() {
         geocodingViewModel = ViewModelProvider(this)[GeocodingViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         reverseGeoViewModel = ViewModelProvider(this)[ReverseGeoViewModel::class.java]
-        weatherViewModel.toastMessage.observe(this) { message ->
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+//        weatherViewModel.toastMessage.observe(this) { message ->
+//            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+//        }
+        sharedViewModel.cityOptionsLiveData.observe(this) {
+//            recyclerView.visibility = RecyclerView.VISIBLE
+//            Toast.makeText(this, "inside cityoptions print", Toast.LENGTH_SHORT).show()
+            Log.i("Cities", sharedViewModel.getCityOptions().toString())
+            adapter.updateSuggestions(sharedViewModel.getCityOptions())
         }
+
     }
+
 
     private fun setPageView() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
@@ -97,73 +103,93 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 query?.let {
                     Log.i ("City name : ", query)
+                    Log.e ("OnQueryTextSubmit", "${query}, log")
                     geocodingViewModel.getData(query, sharedViewModel)
-                    if (sharedViewModel.getCityOptions().isNotEmpty()) {
+
+                    searchView.setQuery("", false)
+//                    searchView.clearFocus()
+//                    Log.e("Layout", "before hiding recycleview")
+//                    adapter.updateSuggestions(emptyList())
+//                    recyclerView.visibility = View.GONE
+
+                    val tmp = sharedViewModel.getCityOptions()
+                    if (tmp.size != 0) {
                         weatherViewModel.getData(
-                            sharedViewModel.getCityOptions()[0].latitude.toString(),
-                            sharedViewModel.getCityOptions()[0].longitude.toString(),
+                            tmp[0].latitude.toString(),
+                            tmp[0].longitude.toString(),
                             sharedViewModel,
-                            reverseGeoViewModel
-                        )
+                            reverseGeoViewModel)
                     } else {
                         sharedViewModel.setErrorMsg("Connection failure.")
                     }
-                    query.removeRange(0, query.length)
-                        //TODO : add erorr - no network
+
+
                 }
-                recyclerView.visibility = View.GONE
-                searchView.setQuery("", false)
-                searchView.clearFocus()
-                return false
+                return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                if (newText?.length!! < 3)  {
-                    recyclerView.visibility = RecyclerView.VISIBLE
+                if (newText == null || newText.length < 3)  {
+                    Log.e ("OnQueryTextChange", "${newText}, log")
                     adapter.updateSuggestions(emptyList())
-                    return false
+                    recyclerView.visibility = RecyclerView.GONE
+                    return true
                 }
                 newText.let { query ->
                     if (query.isNotBlank()) {
-                        geocodingViewModel.getData(query, sharedViewModel)
-                        adapter.updateSuggestions(sharedViewModel.getCityOptions())
                         recyclerView.visibility = RecyclerView.VISIBLE
+                        geocodingViewModel.getData(query, sharedViewModel)
                     } else {
-                        recyclerView.visibility = RecyclerView.GONE
+                        searchView.clearFocus()
+                        adapter.updateSuggestions(emptyList())
+                        recyclerView.visibility = View.GONE
                     }
                 }
                 return true
             }
+
         })
 
         searchView.setOnCloseListener {
+            Log.e("onCLoseListener", "log")
             adapter.updateSuggestions(emptyList())
-            recyclerView.visibility = RecyclerView.GONE
+            recyclerView.visibility = View.GONE
             true
         }
 
     }
 
+//    private fun printCitySuggestions() {
+//        sharedViewModel.cityOptionsLiveData.observe(this) {
+//            recyclerView.visibility = RecyclerView.VISIBLE
+//            adapter.updateSuggestions(sharedViewModel.getCityOptions())
+//        }
+//    }
+
     private fun onCitySelected(city: Result) {
         weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel, reverseGeoViewModel)
         searchView.setQuery("", false)
         searchView.clearFocus()
+        adapter.updateSuggestions(emptyList())
         recyclerView.visibility = View.GONE
         Log.i("RecycleView","Selected City: ${city.name}")
         Toast.makeText(this, "Selected City: ${city.name}", Toast.LENGTH_SHORT).show()
     }
 
 
-    fun requestLocation(view: View) {
-        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (!isLocationPermissionGranted()) {
-                sharedViewModel.setErrorMsg("GeoLocation is not available. Please enable GPS in the settings.")
-            }
+    fun requestLocation(view : View) {
+        if (checkLocationPermission()) {
+            getGPS()
+        } else {
+            requestPermissionLauncher.launch(ACCESS_FINE_LOCATION)
         }
+    }
 
+    @SuppressLint("MissingPermission")
+    private fun getGPS() {
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Log.e("GPS", "GPS is disabled! Please enable it in settings.")
-            sharedViewModel.setErrorMsg("GPS is disabled! Please enable it in settings.")
+            Log.i("GPS", "GPS is disabled! Please enable it in settings.")
+            sharedViewModel.setErrorMsg("GPS is disabled. Please turn it on in settings and try again.")
             return
         }
 
@@ -178,54 +204,28 @@ class MainActivity : AppCompatActivity() {
                 weatherViewModel.getData(latitude, longitude, sharedViewModel, reverseGeoViewModel)
                 Log.d("GPS", "latitude: $latitude, longitude: $longitude")
             } else {
-                Log.e("GPS", "Error getting GPS location!")
-                sharedViewModel.setErrorMsg("Network error.")
+                Log.i("GPS", "Error getting GPS location!")
+                sharedViewModel.setErrorMsg("Cannot get location from GPS. Please try again later.")
             }
         }
     }
 
-//    fun requestLocation(view: View) {
-//        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            if (!isLocationPermissionGranted()) {
-//                sharedViewModel.setErrorMsg("GeoLocation is not available. Please enable GPS in the settings.")
-//            }
-//        }
-//
-//        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
-//        val task: Task<Location> = fusedLocationProviderClient.
-//            getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
-//        task.addOnSuccessListener { location ->
-//            if (location != null) {
-//                val latitude = location.latitude.toString()
-//                val longitude = location.longitude.toString()
-//                weatherViewModel.getData(latitude, longitude, sharedViewModel)
-//                Log.d("Location", "Lat: $latitude, Lon: $longitude")
-//            } else {
-//                sharedViewModel.setErrorMsg("Network error.")
-//            }
-//        }.addOnFailureListener { e ->
-//            Log.e("Location", "Error fetching location", e)
-//            sharedViewModel.setErrorMsg("Error fetching location.")
-//        }
-//    }
-
-
-
-    private fun isLocationPermissionGranted(): Boolean {
-        return if (ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), Constant.REQUEST_CODE_LOCATION_PERMISSION)
-            false
-        } else {
-            true
-        }
+    private fun checkLocationPermission() : Boolean {
+        return ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
     }
 
-//    override fun onDestroy() {
-//        super.onDestroy()
-//        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
-//    }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (!isGranted) {
+            sharedViewModel.setErrorMsg("Access to location permission is not granted. Please enable GPS access in the settings.")
+            Log.i("Location permission", "Location permission denied")
+            Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show()
+        } else {
+            getGPS()
+        }
+    }
 }
 
 
