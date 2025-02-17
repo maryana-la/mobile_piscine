@@ -28,7 +28,7 @@ class SharedViewModel : ViewModel() {
     }
 
     fun getCityOptions() : List<Result> {
-        return cityOptions.value!!
+        return cityOptions.value ?: emptyList()
     }
 
     fun setWeatherForecast(forecast : WeatherModel) {

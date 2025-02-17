@@ -25,7 +25,7 @@ class GeocodingViewModel : ViewModel() {
                     Log.i("Success", response.body().toString())
                     sharedViewModel.setCityOptions(response.body()?.results ?: emptyList())
                 } else {
-                    Log.i("Error : ", response.message())
+                    Log.i("Error geocoding viewmodel: ", response.message())
                     sharedViewModel.setCityOptions(emptyList())
 //                    sharedViewModel.setErrorMsg("10. Could not find any result for the provided address or coordinates")
                 }
