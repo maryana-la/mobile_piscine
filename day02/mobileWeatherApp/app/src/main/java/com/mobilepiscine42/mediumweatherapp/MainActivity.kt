@@ -57,12 +57,14 @@ class MainActivity : AppCompatActivity() {
 //            recyclerView.visibility = RecyclerView.VISIBLE
 //            Toast.makeText(this, "inside cityoptions print", Toast.LENGTH_SHORT).show()
             Log.i("Cities", sharedViewModel.getCityOptions().toString())
-            if (sharedViewModel.getCityOptions().isNotEmpty()) {
-                recyclerView.visibility = View.VISIBLE
-            } else {
-                recyclerView.visibility = View.GONE
-            }
             adapter.updateSuggestions(sharedViewModel.getCityOptions())
+//            if (sharedViewModel.getCityOptions().isNotEmpty()) {
+//                recyclerView.visibility = View.VISIBLE
+//                adapter.updateSuggestions(sharedViewModel.getCityOptions())
+//            } else {
+//                recyclerView.visibility = View.GONE
+//                adapter.updateSuggestions(emptyList())
+//            }
         }
 
     }
@@ -111,11 +113,14 @@ class MainActivity : AppCompatActivity() {
                     Log.e ("OnQueryTextSubmit", "${query}, log")
                     geocodingViewModel.getData(query, sharedViewModel)
 
+                    searchView.setQuery("", false)
+                    searchView.clearFocus()
+                    recyclerView.visibility = View.GONE
                     val tmp = sharedViewModel.getCityOptions()
                     if (tmp.size != 0) {
                        onCitySelected(tmp[0])
                     } else {
-                        sharedViewModel.setErrorMsg("Connection failure.")
+                        sharedViewModel.setErrorMsg("No city with provided details found")
                     }
 
 
@@ -142,15 +147,35 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
 
+//            override fun onQueryTextChange(newText: String?): Boolean {
+//                if (newText == null || newText.length < 3)  {
+//                    Log.e ("OnQueryTextChange", "${newText}, log")
+//                    adapter.updateSuggestions(emptyList())
+//                    recyclerView.visibility = View.GONE
+//                    return true
+//                }
+//                newText.let { query ->
+//                    if (query.isNotBlank()) {
+//                        geocodingViewModel.getData(query, sharedViewModel)
+//                    } else {
+//                        searchView.clearFocus()
+//                        adapter.updateSuggestions(emptyList())
+//                        recyclerView.visibility = View.GONE
+//                    }
+//                }
+//                return true
+//            }
+
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText == null || newText.length < 3)  {
                     Log.e ("OnQueryTextChange", "${newText}, log")
                     adapter.updateSuggestions(emptyList())
-                    recyclerView.visibility = View.GONE
+                    recyclerView.visibility = RecyclerView.GONE
                     return true
                 }
                 newText.let { query ->
                     if (query.isNotBlank()) {
+                        recyclerView.visibility = RecyclerView.VISIBLE
                         geocodingViewModel.getData(query, sharedViewModel)
                     } else {
                         searchView.clearFocus()
