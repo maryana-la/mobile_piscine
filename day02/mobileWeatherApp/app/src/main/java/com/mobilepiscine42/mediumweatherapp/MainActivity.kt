@@ -57,6 +57,11 @@ class MainActivity : AppCompatActivity() {
 //            recyclerView.visibility = RecyclerView.VISIBLE
 //            Toast.makeText(this, "inside cityoptions print", Toast.LENGTH_SHORT).show()
             Log.i("Cities", sharedViewModel.getCityOptions().toString())
+            if (sharedViewModel.getCityOptions().isNotEmpty()) {
+                recyclerView.visibility = View.VISIBLE
+            } else {
+                recyclerView.visibility = View.GONE
+            }
             adapter.updateSuggestions(sharedViewModel.getCityOptions())
         }
 
@@ -106,22 +111,31 @@ class MainActivity : AppCompatActivity() {
                     Log.e ("OnQueryTextSubmit", "${query}, log")
                     geocodingViewModel.getData(query, sharedViewModel)
 
-                    searchView.setQuery("", false)
-//                    searchView.clearFocus()
-//                    Log.e("Layout", "before hiding recycleview")
-//                    adapter.updateSuggestions(emptyList())
-//                    recyclerView.visibility = View.GONE
-
                     val tmp = sharedViewModel.getCityOptions()
                     if (tmp.size != 0) {
-                        weatherViewModel.getData(
-                            tmp[0].latitude.toString(),
-                            tmp[0].longitude.toString(),
-                            sharedViewModel,
-                            reverseGeoViewModel)
+                       onCitySelected(tmp[0])
                     } else {
                         sharedViewModel.setErrorMsg("Connection failure.")
                     }
+
+
+//                    searchView.setQuery("", false)
+////                    searchView.clearFocus()
+////                    Log.e("Layout", "before hiding recycleview")
+////                    adapter.updateSuggestions(emptyList())
+////                    recyclerView.visibility = View.GONE
+//
+//                    val tmp = sharedViewModel.getCityOptions()
+//                    sharedViewModel.setCityOptions(emptyList())
+//                    if (tmp.size != 0) {
+//                        weatherViewModel.getData(
+//                            tmp[0].latitude.toString(),
+//                            tmp[0].longitude.toString(),
+//                            sharedViewModel,
+//                            reverseGeoViewModel)
+//                    } else {
+//                        sharedViewModel.setErrorMsg("Connection failure.")
+//                    }
 
 
                 }
@@ -132,12 +146,11 @@ class MainActivity : AppCompatActivity() {
                 if (newText == null || newText.length < 3)  {
                     Log.e ("OnQueryTextChange", "${newText}, log")
                     adapter.updateSuggestions(emptyList())
-                    recyclerView.visibility = RecyclerView.GONE
+                    recyclerView.visibility = View.GONE
                     return true
                 }
                 newText.let { query ->
                     if (query.isNotBlank()) {
-                        recyclerView.visibility = RecyclerView.VISIBLE
                         geocodingViewModel.getData(query, sharedViewModel)
                     } else {
                         searchView.clearFocus()
@@ -170,7 +183,8 @@ class MainActivity : AppCompatActivity() {
         weatherViewModel.getData(city.latitude.toString(), city.longitude.toString(), sharedViewModel, reverseGeoViewModel)
         searchView.setQuery("", false)
         searchView.clearFocus()
-        adapter.updateSuggestions(emptyList())
+//        adapter.updateSuggestions(emptyList())
+        sharedViewModel.setCityOptions(emptyList())
         recyclerView.visibility = View.GONE
         Log.i("RecycleView","Selected City: ${city.name}")
         Toast.makeText(this, "Selected City: ${city.name}", Toast.LENGTH_SHORT).show()

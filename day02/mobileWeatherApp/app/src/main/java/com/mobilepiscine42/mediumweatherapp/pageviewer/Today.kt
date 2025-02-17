@@ -70,35 +70,37 @@ class Today : Fragment() {
         }
 
 
-//        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
-//            Log.e("Error message", "inside")
-//            city?.text = ""
-//            region?.text = ""
-//            country?.text = ""
-//            mainLayout?.removeView(errorMessage)
-//
-//            innerLayout?.removeAllViewsInLayout()
-//            errorMessage.apply {
-//                text = sharedViewModel.getErrorMsg()
-//                setTextColor(Color.RED)
-//                textAlignment = View.TEXT_ALIGNMENT_CENTER
-//                textSize = 20f
-//                maxLines = 3
-//                ellipsize = TextUtils.TruncateAt.END
-//                setLineSpacing(4f, 1.2f)
-//                layoutParams = ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.WRAP_CONTENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//            }
-//            mainLayout?.post {
-//                mainLayout.addView(errorMessage)
-//            }
+        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
+            Log.e("Error message", "inside")
+            city?.text = ""
+            region?.text = ""
+            country?.text = ""
+            mainLayout?.removeView(errorMessage)
+
+            innerLayout?.removeAllViewsInLayout()
+            errorMessage.apply {
+                text = sharedViewModel.getErrorMsg()
+                setTextColor(Color.RED)
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                textSize = 20f
+                maxLines = 3
+                ellipsize = TextUtils.TruncateAt.END
+                setLineSpacing(4f, 1.2f)
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            mainLayout?.post {
+                if (errorMessage.parent == null) {
+                    mainLayout.addView(errorMessage)
+                }
+            }
 ////            mainLayout?.invalidate()
-////            mainLayout?.visibility = View.VISIBLE
-////            errorMessage.visibility = View.VISIBLE
+//            mainLayout?.visibility = View.VISIBLE
+//            errorMessage.visibility = View.VISIBLE
 //
-//        }
+        }
         return view
     }
 

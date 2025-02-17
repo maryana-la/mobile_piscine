@@ -1,6 +1,7 @@
 package com.mobilepiscine42.mediumweatherapp.geocoding_api
 
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobilepiscine42.mediumweatherapp.api.Constant
@@ -26,7 +27,7 @@ class GeocodingViewModel : ViewModel() {
                 } else {
                     Log.i("Error : ", response.message())
                     sharedViewModel.setCityOptions(emptyList())
-                    sharedViewModel.setErrorMsg("10. Could not find any result for the provided address or coordinates")
+//                    sharedViewModel.setErrorMsg("10. Could not find any result for the provided address or coordinates")
                 }
             } catch (e : IOException) {
                 Log.e("Network", "No internet connection", e)
