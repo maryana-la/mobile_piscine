@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -47,6 +48,7 @@ class Today : Fragment() {
             val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
             mainLayout?.removeView(errorMessage)
             innerLayout?.removeAllViewsInLayout()
+            innerLayout?.visibility = View.VISIBLE
 
 
             for (i in 0 until 24) {
@@ -79,13 +81,17 @@ class Today : Fragment() {
                 mainLayout?.removeView(errorMessage)
 
                 innerLayout?.removeAllViewsInLayout()
+                innerLayout?.visibility = View.GONE
+
+                Log.d("mainLayout Debug", "Visibility: ${mainLayout?.visibility}")
                 errorMessage.apply {
                     text = sharedViewModel.getErrorMsg()
                     setTextColor(Color.RED)
+
                     textAlignment = View.TEXT_ALIGNMENT_CENTER
                     textSize = 20f
                     maxLines = 3
-                    ellipsize = TextUtils.TruncateAt.END
+//                    ellipsize = TextUtils.TruncateAt.END
                     setLineSpacing(4f, 1.2f)
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -101,10 +107,19 @@ class Today : Fragment() {
                         Log.i("Error msg parent", errorMessage.parent.toString())
                     }
                 }
-                mainLayout?.invalidate()
+                Log.d("mainLayout Debug", "Visibility: ${mainLayout?.visibility}")
 //                mainLayout?.visibility = View.VISIBLE
+                Log.d("error message", "Visibility: ${errorMessage.visibility}")
 //                errorMessage.visibility = View.VISIBLE
                 sharedViewModel.setErrorMsg("")
+
+//
+//                errorMessage.bringToFront()
+//                errorMessage.requestLayout()
+//                errorMessage.invalidate()
+//
+//
+//                mainLayout?.requestLayout()
             }
         }
         return view

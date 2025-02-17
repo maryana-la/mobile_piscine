@@ -20,7 +20,7 @@ class GeocodingViewModel : ViewModel() {
     fun getData(city : String, sharedViewModel: SharedViewModel) {
         viewModelScope.launch {
             try {
-                val response = geocodingApi.getLocationList(city, Constant.NUMBER_OF_SEARCH_RESULT)
+                val response = geocodingApi.getLocationList(city.trim(), Constant.NUMBER_OF_SEARCH_RESULT)
                 if (response.body()?.results != null) {
                     Log.i("Success", response.body().toString())
                     sharedViewModel.setCityOptions(response.body()?.results ?: emptyList())

@@ -190,6 +190,7 @@ class MainActivity : AppCompatActivity() {
 
         searchView.setOnCloseListener {
             Log.e("onCLoseListener", "log")
+            searchView.clearFocus()
             adapter.updateSuggestions(emptyList())
             recyclerView.visibility = View.GONE
             true
