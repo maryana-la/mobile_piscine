@@ -14,5 +14,4 @@ object RetrofitInstance {
     }
 
     val geocodingApi : GeocodingApi = getInstance().create(GeocodingApi::class.java)
-
 }

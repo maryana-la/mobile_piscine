@@ -31,11 +31,6 @@
                     android:layout_weight="5"
                     android:queryHint="Search location..."
                     app:iconifiedByDefault="false" />
-<!--                app:iconifiedByDefault: If false, the search field is always expanded.-->
-
-                <!--                    android:layout_alignParentStart="true"-->
-                <!--                    android:layout_alignParentTop="true"-->
-                <!--                    android:layout_toStartOf="@+id/search_geo_button"-->
 
                 <ImageButton
                     android:id="@+id/searchGeoButton"

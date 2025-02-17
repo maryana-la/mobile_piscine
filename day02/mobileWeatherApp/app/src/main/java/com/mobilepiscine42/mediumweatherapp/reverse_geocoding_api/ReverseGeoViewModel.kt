@@ -31,13 +31,13 @@ class ReverseGeoViewModel : ViewModel() {
                 }
             } catch (e : IOException) {
                 Log.e("Network", "No internet connection", e)
-                sharedViewModel.setErrorMsg("7.No internet connection. Please check your network and try again.")
+                sharedViewModel.setErrorMsg("No internet connection.\nPlease check your network and try again.")
             } catch (e : HttpException) {
                 Log.e ("API error", "HTTP: ${e.message()}", e)
-                sharedViewModel.setErrorMsg("8.Error fetching weather data. Please try again later.")
+                sharedViewModel.setErrorMsg("Error fetching weather data.\nPlease try again later.")
             } catch (e : Exception) {
                 Log.e ("WeatherViewModel", "Unexpected error: ${e.message}", e)
-                sharedViewModel.setErrorMsg("9.Unexpected error has happened. Please try again later.")
+                sharedViewModel.setErrorMsg("Unexpected error has happened.\nPlease try again later.")
             }
         }
     }

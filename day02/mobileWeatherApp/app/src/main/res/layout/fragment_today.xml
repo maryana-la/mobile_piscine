@@ -9,14 +9,6 @@
     android:orientation="vertical"
     tools:context=".pageviewer.Today">
 
-<!--    <TextView-->
-<!--        android:id="@+id/textView"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/today"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="40sp" />-->
-
     <TextView
         android:id="@+id/city"
         android:layout_width="match_parent"
@@ -35,13 +27,6 @@
         android:layout_height="wrap_content"
         android:textAlignment="center"
         android:textSize="20sp" />
-
-<!--    <TextView-->
-<!--        android:id="@+id/errorMessage"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="20sp" />-->
 
     <ScrollView
         android:id="@+id/scrollView"

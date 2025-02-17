@@ -1,10 +1,7 @@
 package com.mobilepiscine42.mediumweatherapp.pageviewer
 
-import android.graphics.Color
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
-import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +36,8 @@ class Today : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
         sharedViewModel.cityLiveData.observe(viewLifecycleOwner) {
+            mainLayout?.removeView(errorMessage)
+            Util.removeErrorMessage(errorMessage)
             city?.text = sharedViewModel.getCurrentCity().City
             region?.text = sharedViewModel.getCurrentCity().Region
             country?.text = sharedViewModel.getCurrentCity().CntryName
@@ -47,6 +46,7 @@ class Today : Fragment() {
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
             val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
             mainLayout?.removeView(errorMessage)
+            Util.removeErrorMessage(errorMessage)
             innerLayout?.removeAllViewsInLayout()
             innerLayout?.visibility = View.VISIBLE
 
@@ -71,55 +71,19 @@ class Today : Fragment() {
             }
         }
 
-
         sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
             if (sharedViewModel.getErrorMsg().isNotEmpty()) {
-                Log.e("Error message", "inside")
+                Log.e("FRAGMENT Today", "Error message print")
                 city?.text = ""
                 region?.text = ""
                 country?.text = ""
                 mainLayout?.removeView(errorMessage)
-
                 innerLayout?.removeAllViewsInLayout()
                 innerLayout?.visibility = View.GONE
-
-                Log.d("mainLayout Debug", "Visibility: ${mainLayout?.visibility}")
-                errorMessage.apply {
-                    text = sharedViewModel.getErrorMsg()
-                    setTextColor(Color.RED)
-
-                    textAlignment = View.TEXT_ALIGNMENT_CENTER
-                    textSize = 20f
-                    maxLines = 3
-//                    ellipsize = TextUtils.TruncateAt.END
-                    setLineSpacing(4f, 1.2f)
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
+                if (mainLayout != null) {
+                    errorMessage.text = sharedViewModel.getErrorMsg()
+                    Util.setupErrorMessage(errorMessage, mainLayout)
                 }
-
-                mainLayout?.post {
-                    if (errorMessage.parent == null) {
-                        Log.i("mainLayout?.post", errorMessage.text.toString())
-                        mainLayout.addView(errorMessage)
-                    } else {
-                        Log.i("Error msg parent", errorMessage.parent.toString())
-                    }
-                }
-                Log.d("mainLayout Debug", "Visibility: ${mainLayout?.visibility}")
-//                mainLayout?.visibility = View.VISIBLE
-                Log.d("error message", "Visibility: ${errorMessage.visibility}")
-//                errorMessage.visibility = View.VISIBLE
-                sharedViewModel.setErrorMsg("")
-
-//
-//                errorMessage.bringToFront()
-//                errorMessage.requestLayout()
-//                errorMessage.invalidate()
-//
-//
-//                mainLayout?.requestLayout()
             }
         }
         return view
