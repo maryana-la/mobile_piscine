@@ -16,8 +16,6 @@ object Constant {
     const val LANG = "en"
     const val FORSTORAGE = "false"
     const val FORMAT = "pjson"
-
-
 }
 
 //https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&

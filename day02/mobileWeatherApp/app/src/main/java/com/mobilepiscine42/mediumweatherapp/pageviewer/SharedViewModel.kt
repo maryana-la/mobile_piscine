@@ -22,7 +22,6 @@ class SharedViewModel : ViewModel() {
     val errorLiveData: LiveData<String> get() = errorMsg
     private var errorMsg = MutableLiveData<String>()
 
-
     fun setCityOptions(fromAPI : List<Result>) {
         cityOptions.value = fromAPI
     }
@@ -48,11 +47,10 @@ class SharedViewModel : ViewModel() {
     }
 
     fun setErrorMsg(message : String) {
-        errorMsg.value = message
+        errorMsg.postValue(message)
     }
 
     fun getErrorMsg() : String {
         return errorMsg.value!!
     }
-
 }
