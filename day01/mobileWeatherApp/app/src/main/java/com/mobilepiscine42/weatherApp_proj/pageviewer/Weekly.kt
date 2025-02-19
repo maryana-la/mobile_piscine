@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.pageviewer
+package com.mobilepiscine42.weatherApp_proj.pageviewer
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.ViewModelProvider
-import com.mobilepiscine42.mobileweatherapp.R
+import com.mobilepiscine42.weatherApp_proj.R
 
 class Weekly : Fragment() {
 

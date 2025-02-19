@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp
+package com.mobilepiscine42.weatherApp_proj
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

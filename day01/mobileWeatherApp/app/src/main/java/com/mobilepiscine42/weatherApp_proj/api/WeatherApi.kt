@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.api
+package com.mobilepiscine42.weatherApp_proj.api
 
 import retrofit2.Response
 import retrofit2.http.GET

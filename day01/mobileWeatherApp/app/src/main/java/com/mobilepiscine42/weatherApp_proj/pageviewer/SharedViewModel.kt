@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.pageviewer
+package com.mobilepiscine42.weatherApp_proj.pageviewer
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

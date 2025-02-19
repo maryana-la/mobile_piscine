@@ -1,14 +1,14 @@
-package com.mobilepiscine42.mobileweatherapp
+package com.mobilepiscine42.weatherApp_proj
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.mobilepiscine42.mobileweatherapp.api.Constant
+import com.mobilepiscine42.weatherApp_proj.api.Constant
 import kotlinx.coroutines.launch
-import com.mobilepiscine42.mobileweatherapp.api.RetrofitInstance
-import com.mobilepiscine42.mobileweatherapp.pageviewer.SharedViewModel
+import com.mobilepiscine42.weatherApp_proj.api.RetrofitInstance
+import com.mobilepiscine42.weatherApp_proj.pageviewer.SharedViewModel
 
 class WeatherViewModel : ViewModel() {
 
