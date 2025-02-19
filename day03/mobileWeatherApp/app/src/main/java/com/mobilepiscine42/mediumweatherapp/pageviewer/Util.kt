@@ -10,6 +10,7 @@ import android.view.View
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,6 +76,29 @@ class Util {
             }
         }
 
+        fun setupErrorMessageConstraint(errorMessage: TextView, mainLayout: ConstraintLayout) {
+//            val layoutParams = ConstraintLayout.LayoutParams().apply {
+//                gravity = Gravity.CENTER
+//                bottomMargin = 60.dpToPx()
+//            }
+//            errorMessage.layoutParams = layoutParams
+            errorMessage.setTextColor(Color.RED)
+            errorMessage.textAlignment = TEXT_ALIGNMENT_CENTER
+            errorMessage.textSize = 25f
+            errorMessage.maxLines = 3
+            errorMessage.ellipsize = TextUtils.TruncateAt.END
+            errorMessage.setLineSpacing(4f, 1.2f)
+            errorMessage.visibility = View.VISIBLE
+            mainLayout.post {
+                if (errorMessage.parent == null) {
+                    Log.i("mainLayout?.post", errorMessage.text.toString())
+                    mainLayout.addView(errorMessage, 3)
+                } else {
+                    Log.i("Error msg parent", errorMessage.parent.toString())
+                }
+            }
+        }
+
         fun removeErrorMessage (errorMessage: TextView) {
             errorMessage.text = ""
             errorMessage.visibility = View.GONE
@@ -82,7 +106,7 @@ class Util {
 
         fun weatherCode(code: Int): String = when (code) {
             0 -> "Clear sky"
-            1, 2, 3 -> "Overcast"
+            1, 2, 3 -> "Partly cloudy"
             45, 48 -> "Fog"
             51 -> "Light drizzle"
             53 -> "Moderate drizzle"

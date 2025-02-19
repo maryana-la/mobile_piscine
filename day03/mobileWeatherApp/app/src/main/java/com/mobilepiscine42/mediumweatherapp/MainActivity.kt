@@ -42,8 +42,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
         setPageView()
         setLocationService()
         setSearchView()
@@ -86,8 +84,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun setSearchView() {
         searchView = findViewById(R.id.searchGeoText)
-        searchView.clearFocus()
         searchView.isIconified = false
+        searchView.clearFocus()
 
 
 //        searchView.queryHint = "1Search location"

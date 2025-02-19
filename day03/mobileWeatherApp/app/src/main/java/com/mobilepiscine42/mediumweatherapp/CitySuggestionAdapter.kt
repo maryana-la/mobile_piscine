@@ -44,10 +44,6 @@ class CitySuggestionAdapter(
             cityName.text = city.name
             cityRegion.text = city.admin1
             cityCountry.text = city.country
-
-
-//            cityName.text = listOfNotNull(city.name, city.admin1, city.country)
-//                .joinToString(separator = ", ")
         }
     }
 }
