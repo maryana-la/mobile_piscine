@@ -3,6 +3,7 @@ package com.mobilepiscine42.advanced_weather_app.pageviewer
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -11,6 +12,8 @@ import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import com.mobilepiscine42.advanced_weather_app.R
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -104,7 +107,7 @@ class Util {
             errorMessage.visibility = View.GONE
         }
 
-        fun weatherCode(code: Int): String = when (code) {
+        fun setWeatherDescription(code: Int): String = when (code) {
             0 -> "Clear sky"
             1, 2, 3 -> "Partly cloudy"
             45, 48 -> "Fog"
@@ -123,8 +126,24 @@ class Util {
             85, 86 -> "Snow showers"
             95 -> "Thunderstorm"
             96, 99 -> "Thunderstorm with hail"
-            else -> "Not defined"
+            else -> ""
         }
 
+        fun setWeatherImage(context: Context, weatherCode: Int): Drawable? {
+            val drawableResId = when (weatherCode) {
+                0 -> R.drawable.ic_weather_sunny
+                1, 2, 3 -> R.drawable.ic_weather_partly_cloudy
+                45, 48 -> R.drawable.ic_weather_fog
+                51, 53, 55, 56, 57 -> R.drawable.ic_weather_drizzle
+                61, 63 -> R.drawable.ic_weather_light_rain
+                65, 66, 67, 80, 81, 82 -> R.drawable.ic_weather_heavy_rain
+                71, 73, 75, 77, 85, 86 -> R.drawable.ic_weather_snow
+                95 -> R.drawable.ic_weather_thunderstorm
+                96, 99 -> R.drawable.ic_weather_hail
+                else -> R.drawable.ic_weather_undefined
+            }
+
+            return ContextCompat.getDrawable(context, drawableResId)
+        }
     }
 }

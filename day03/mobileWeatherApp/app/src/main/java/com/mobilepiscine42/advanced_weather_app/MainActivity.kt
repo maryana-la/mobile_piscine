@@ -1,27 +1,33 @@
 package com.mobilepiscine42.advanced_weather_app
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.SearchView
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.mobilepiscine42.advanced_weather_app.api.Constant
+import com.mobilepiscine42.advanced_weather_app.api.Constant.REQUEST_CODE_LOCATION_PERMISSION
 import com.mobilepiscine42.advanced_weather_app.geocoding_api.GeocodingViewModel
 import com.mobilepiscine42.advanced_weather_app.geocoding_api.Result
 import com.mobilepiscine42.advanced_weather_app.pageviewer.SharedViewModel
@@ -30,6 +36,9 @@ import com.mobilepiscine42.advanced_weather_app.reverse_geocoding_api.ReverseGeo
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
     private lateinit var locationManager: LocationManager
     private lateinit var weatherViewModel : WeatherViewModel
     private lateinit var geocodingViewModel : GeocodingViewModel
@@ -78,19 +87,33 @@ class MainActivity : AppCompatActivity() {
             true
         }
     }
+
     private fun setLocationService() {
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 50000)
+            .setWaitForAccurateLocation(false)
+            .setMinUpdateIntervalMillis(2000)
+            .setMaxUpdateDelayMillis(5000)
+            .build()
+
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                super.onLocationResult(locationResult)
+                for (location in locationResult.locations) {
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    Log.d("Location Update", "Lat: $latitude, Lon: $longitude")
+                }
+            }
+        }
     }
 
     private fun setSearchView() {
         searchView = findViewById(R.id.searchGeoText)
         searchView.isIconified = false
         searchView.clearFocus()
-
-
-//        searchView.queryHint = "1Search location"
-//        searchView.queryHint = HtmlCompat.fromHtml("<font color = #FAEADCDC>" + getString(R.string.hintSearchView) + "</font>", HtmlCompat.FROM_HTML_MODE_LEGACY)
-
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -158,11 +181,23 @@ class MainActivity : AppCompatActivity() {
         Log.i("RecycleView","Selected City: ${city.name}")
     }
 
-    fun requestLocation(view : View) {
-        if (checkLocationPermission()) {
+    fun requestLocation(view: View) {
+        if (isLocationPermissionGranted()) {
             getGPS()
         } else {
-            requestPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), Constant.REQUEST_CODE_LOCATION_PERMISSION)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_LOCATION_PERMISSION) {
+            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
+                getGPS()
+            } else {
+                sharedViewModel.setErrorMsg("Location permission is not granted.\nPlease enable GPS access in the settings.")
+                Log.i("Location permission", "Location permission denied")
+            }
         }
     }
 
@@ -174,38 +209,36 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        locationManager.getCurrentLocation(
-            LocationManager.GPS_PROVIDER,
-            null,
-            mainExecutor
-        ) { location: Location? ->
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
+        val task: Task<Location> = fusedLocationProviderClient.
+        getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
+        task.addOnSuccessListener { location ->
             if (location != null) {
                 val latitude = location.latitude.toString()
                 val longitude = location.longitude.toString()
                 weatherViewModel.getData(latitude, longitude, sharedViewModel, reverseGeoViewModel)
                 Log.d("GPS", "latitude: $latitude, longitude: $longitude")
             } else {
-                Log.i("GPS", "Error getting GPS location!")
+                Log.e("GPS", "Error getting GPS location!")
                 sharedViewModel.setErrorMsg("Cannot get location from GPS.\nPlease try again later.")
             }
+        }.addOnFailureListener { e ->
+            Log.e("Location", "Error fetching location", e)
+            sharedViewModel.setErrorMsg("Error getting location from GPS.\nPlease try again later.")
         }
     }
 
-    private fun checkLocationPermission() : Boolean {
-        return ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED
+    private fun isLocationPermissionGranted(): Boolean {
+        return !(ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED)
     }
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (!isGranted) {
-            sharedViewModel.setErrorMsg("Location permission is not granted.\nPlease enable GPS access in the settings.")
-            Log.i("Location permission", "Location permission denied")
-        } else {
-            getGPS()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
     }
+
 }
 
 

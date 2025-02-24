@@ -59,7 +59,7 @@ class Weekly : Fragment() {
                 val tempDayMax = Util.setTextViewForFragments(dailyForecast.temperature_2m_max[i].toString() +
                         sharedViewModel.getWeatherForecast().daily_units.temperature_2m_max,
                     requireContext())
-                val weatherDescription = Util.setTextViewForFragments(Util.weatherCode(dailyForecast.weather_code[i]),
+                val weatherDescription = Util.setTextViewForFragments(Util.setWeatherDescription(dailyForecast.weather_code[i]),
                     requireContext())
 
                 linePerDay.addView(timeTmp)

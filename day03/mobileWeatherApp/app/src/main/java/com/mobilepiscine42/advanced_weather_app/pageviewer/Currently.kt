@@ -1,21 +1,18 @@
 package com.mobilepiscine42.advanced_weather_app.pageviewer
 
-import android.graphics.Color
 import android.os.Bundle
-import android.text.TextUtils
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.advanced_weather_app.R
-import com.mobilepiscine42.advanced_weather_app.pageviewer.Util.Companion.dpToPx
+
 
 class Currently : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
@@ -50,23 +47,21 @@ class Currently : Fragment() {
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
             mainLayout?.removeView(errorMessage)
             Util.removeErrorMessage(errorMessage)
+
             val temperatureValue = sharedViewModel.getWeatherForecast().current.temperature_2m.toString()
             val temperatureUnit = sharedViewModel.getWeatherForecast().current_units.temperature_2m
             temperature?.text = getString(R.string.temperature_text, temperatureValue, temperatureUnit)
-//            temperature?.text = sharedViewModel.getWeatherForecast().current.temperature_2m.toString() +
-//                sharedViewModel.getWeatherForecast().current_units.temperature_2m
+
+            weatherDescription?.text = Util.setWeatherDescription(sharedViewModel.getWeatherForecast().current.weather_code)
+            weatherIcon?.setImageDrawable(context?.let {
+                it1 -> Util.setWeatherImage(it1, sharedViewModel.getWeatherForecast().current.weather_code) })
 
             val windSpeed = sharedViewModel.getWeatherForecast().current.wind_speed_10m.toString()
             val windUnit = sharedViewModel.getWeatherForecast().current_units.wind_speed_10m
             val windDirection = Util.getWindDirection(sharedViewModel.getWeatherForecast().current.wind_direction_10m)
-
             wind?.text = getString(R.string.wind_text, windSpeed, windUnit, windDirection)
-
-//            wind?.text = sharedViewModel.getWeatherForecast().current.wind_speed_10m.toString() +
-//                    sharedViewModel.getWeatherForecast().current_units.wind_speed_10m + " " +
-//                    Util.getWindDirection(sharedViewModel.getWeatherForecast().current.wind_direction_10m)
-
-            weatherDescription?.text = Util.weatherCode(sharedViewModel.getWeatherForecast().current.weather_code)
+            val windIcon = context?.let { it1 -> ContextCompat.getDrawable(it1, R.drawable.ic_weather_wind) }
+            wind?.setCompoundDrawablesWithIntrinsicBounds(windIcon, null, null, null)
         }
 
 //        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
@@ -89,6 +84,9 @@ class Currently : Fragment() {
                 city?.text = ""
                 region?.text = ""
                 temperature?.text = ""
+                weatherDescription?.text = ""
+                weatherIcon?.setImageDrawable(null)
+                wind?.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
                 wind?.text = ""
                 mainLayout?.removeView(errorMessage)
                 if (mainLayout != null) {

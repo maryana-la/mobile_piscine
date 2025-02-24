@@ -19,9 +19,6 @@
             android:layout_gravity="center"
             app:tint="@color/grey" />
 
-<!--        <item-->
-<!--            android:id="@+id/weekly"-->
-<!--            android:icon="@drawable/city_icon" />-->
 
         <TextView
             android:id="@+id/cityName"
@@ -32,6 +29,9 @@
             android:paddingEnd="4dp"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:maxWidth="250sp"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/black" />
         <TextView
             android:id="@+id/cityRegion"
@@ -41,6 +41,9 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:textSize="14sp"
+            android:maxLength="20"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/grey" />
         <TextView
             android:id="@+id/cityCountry"
@@ -50,6 +53,9 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:textSize="14sp"
+            android:maxLength="20"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:textColor="@color/grey" />
 
     </LinearLayout>
