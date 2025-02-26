@@ -31,7 +31,6 @@ class Today : Fragment() {
         val scrollView = view?.findViewById<ScrollView>(R.id.scrollView)
         val city = view?.findViewById<TextView>(R.id.city)
         val region = view?.findViewById<TextView>(R.id.region)
-        val country = view?.findViewById<TextView>(R.id.country)
         val errorMessage = TextView(context)
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
 
@@ -39,8 +38,8 @@ class Today : Fragment() {
             mainLayout?.removeView(errorMessage)
             Util.removeErrorMessage(errorMessage)
             city?.text = sharedViewModel.getCurrentCity().City
-            region?.text = sharedViewModel.getCurrentCity().Region
-            country?.text = sharedViewModel.getCurrentCity().CntryName
+            region?.text = listOfNotNull(sharedViewModel.getCurrentCity().Region,  sharedViewModel.getCurrentCity().CntryName)
+                .joinToString(separator = ", ")
         }
 
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
@@ -52,8 +51,8 @@ class Today : Fragment() {
 
 
             for (i in 0 until 24) {
-                val linePerHour = LinearLayout(requireContext()).apply {
-                    orientation = LinearLayout.HORIZONTAL
+                val columnPerHour = LinearLayout(requireContext()).apply {
+                    orientation = LinearLayout.VERTICAL
                 }
 
                 val timeStamp = Util.setTextViewForFragments(Util.formatTimeHHMM(hourlyForecast.time[i]), requireContext())
@@ -64,10 +63,10 @@ class Today : Fragment() {
                             sharedViewModel.getWeatherForecast().hourly_units.wind_speed_10m + " " +
                             Util.getWindDirection(hourlyForecast.wind_direction_10m[i]), requireContext()
                     ).apply { layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 2f) }
-                linePerHour.addView(timeStamp)
-                linePerHour.addView(temperatureHour)
-                linePerHour.addView(windHour)
-                innerLayout?.addView(linePerHour)
+                columnPerHour.addView(timeStamp)
+                columnPerHour.addView(temperatureHour)
+                columnPerHour.addView(windHour)
+                innerLayout?.addView(columnPerHour)
             }
         }
 
@@ -76,7 +75,6 @@ class Today : Fragment() {
                 Log.e("FRAGMENT Today", "Error message print")
                 city?.text = ""
                 region?.text = ""
-                country?.text = ""
                 mainLayout?.removeView(errorMessage)
                 innerLayout?.removeAllViewsInLayout()
                 innerLayout?.visibility = View.GONE

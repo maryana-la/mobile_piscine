@@ -19,7 +19,6 @@
             android:layout_gravity="center"
             app:tint="@color/grey" />
 
-
         <TextView
             android:id="@+id/cityName"
             android:layout_width="wrap_content"
@@ -33,6 +32,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/black" />
+
         <TextView
             android:id="@+id/cityRegion"
             android:layout_width="wrap_content"
@@ -45,6 +45,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="@color/grey" />
+
         <TextView
             android:id="@+id/cityCountry"
             android:layout_width="wrap_content"
