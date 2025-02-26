@@ -212,6 +212,7 @@ class MainActivity : AppCompatActivity() {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, mainLooper)
         val task: Task<Location> = fusedLocationProviderClient.
         getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, CancellationTokenSource().token)
+        searchView.clearFocus()
         task.addOnSuccessListener { location ->
             if (location != null) {
                 val latitude = location.latitude.toString()

@@ -52,15 +52,15 @@ class Weekly : Fragment() {
                 val linePerDay = LinearLayout(requireContext()).apply {
                     orientation = LinearLayout.HORIZONTAL
                 }
-                val timeTmp = Util.setTextViewForFragments(dailyForecast.time[i], requireContext())
+                val timeTmp = Util.setTextViewForFragments(dailyForecast.time[i], requireContext(), 20f)
                 val tempDayMin = Util.setTextViewForFragments(dailyForecast.temperature_2m_min[i].toString() +
                         sharedViewModel.getWeatherForecast().daily_units.temperature_2m_min,
-                    requireContext())
+                    requireContext(), 20f)
                 val tempDayMax = Util.setTextViewForFragments(dailyForecast.temperature_2m_max[i].toString() +
                         sharedViewModel.getWeatherForecast().daily_units.temperature_2m_max,
-                    requireContext())
+                    requireContext(), 20f)
                 val weatherDescription = Util.setTextViewForFragments(Util.setWeatherDescription(dailyForecast.weather_code[i]),
-                    requireContext())
+                    requireContext(), 20f)
 
                 linePerDay.addView(timeTmp)
                 linePerDay.addView(tempDayMin)

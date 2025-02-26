@@ -2,7 +2,10 @@ package com.mobilepiscine42.advanced_weather_app.pageviewer
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.text.TextUtils
 import android.util.Log
@@ -38,10 +41,10 @@ class Util {
             return dateTime.format(formatter)
         }
 
-        fun setTextViewForFragments(input : String, context : Context) : TextView {
+        fun setTextViewForFragments(input : String, context : Context, sizeText : Float) : TextView {
             val result = TextView(context).apply {
                 text = input
-                textSize = 20f
+                textSize = sizeText
                 textAlignment = TEXT_ALIGNMENT_CENTER
                 layoutParams = LinearLayout.LayoutParams(
                     0,
@@ -144,6 +147,18 @@ class Util {
             }
 
             return ContextCompat.getDrawable(context, drawableResId)
+        }
+
+        fun resizeVectorDrawable(context: Context, drawableId: Int, width: Int, height: Int): BitmapDrawable {
+            val drawable = ContextCompat.getDrawable(context, drawableId) ?: return BitmapDrawable()
+
+            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+
+            return BitmapDrawable(context.resources, bitmap)
         }
     }
 }

@@ -32,42 +32,31 @@
         android:ellipsize="end" />
 
 
-    <ScrollView
+    <HorizontalScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true"
-        android:paddingBottom="100dp">
+        android:fillViewport="true" >
+<!--        android:paddingBottom="100dp"-->
 
         <LinearLayout
             android:id="@+id/innerLayout"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal" >
+            android:orientation="horizontal"
+            android:gravity="center">
 
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <ImageView
-                android:id="@+id/weatherIcon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:contentDescription="@string/weather_illustration"/>
-
-            <TextView
-                android:id="@+id/temperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/wind"
-                android:layout_width="wrap_content"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/forecastRecyclerView"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical" />
+                android:background="@color/transparent_white"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal"
+                android:visibility="gone" />
+
 
         </LinearLayout>
-    </ScrollView>
+    </HorizontalScrollView>
 
 </LinearLayout>
