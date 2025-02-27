@@ -7,4 +7,7 @@
     <string name="hintSearchView">Search location…</string>
     <string name="temperature_text">%1$s %2$s</string>
     <string name="wind_text">%1$s %2$s %3$s</string>
+    <string name="weather_illustration">weather_illustration</string>
+    <string name="background_photo">background_photo</string>
+    <string name="wind_icon">wind_icon</string>
 </resources>
