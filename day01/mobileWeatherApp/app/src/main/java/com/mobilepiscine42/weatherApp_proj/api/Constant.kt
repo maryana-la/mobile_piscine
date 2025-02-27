@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.api
+package com.mobilepiscine42.weatherApp_proj.api
 
 object Constant {
     val apiKey = "288eeda57dc2488c8f1142752240312"

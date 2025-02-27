@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp
+package com.mobilepiscine42.weatherApp_proj
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -18,9 +18,9 @@ import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.mobilepiscine42.mobileweatherapp.pageviewer.SharedViewModel
-import com.mobilepiscine42.mobileweatherapp.pageviewer.ViewPagerAdapter
-import com.mobilepiscine42.mobileweatherapp.api.Constant
+import com.mobilepiscine42.weatherApp_proj.pageviewer.SharedViewModel
+import com.mobilepiscine42.weatherApp_proj.pageviewer.ViewPagerAdapter
+import com.mobilepiscine42.weatherApp_proj.api.Constant
 
 class MainActivity : AppCompatActivity() {
 

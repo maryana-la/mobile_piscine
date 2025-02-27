@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.api
+package com.mobilepiscine42.weatherApp_proj.api
 
 data class Location(
     val country: String,

@@ -1,4 +1,4 @@
-package com.mobilepiscine42.mobileweatherapp.api
+package com.mobilepiscine42.weatherApp_proj.api
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

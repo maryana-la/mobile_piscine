@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.mobilepiscine42.mobileweatherapp"
+    namespace = "com.mobilepiscine42.weatherApp_proj"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.mobilepiscine42.mobileweatherapp"
+        applicationId = "com.mobilepiscine42.weatherApp_proj"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
