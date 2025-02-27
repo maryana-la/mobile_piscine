@@ -1,5 +1,6 @@
 package com.mobilepiscine42.advanced_weather_app.pageviewer
 
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,11 +11,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mobilepiscine42.advanced_weather_app.R
 import com.mobilepiscine42.advanced_weather_app.api.Hourly
 import com.mobilepiscine42.advanced_weather_app.api.HourlyUnits
-import androidx.fragment.app.Fragment
+import com.mobilepiscine42.advanced_weather_app.api.Constant
 
 class ForecastAdapter(
+    private val context: Context,
     private var hourlyForecast: Hourly,
-    val hourlyUnits: HourlyUnits
+    private val hourlyUnits: HourlyUnits
 ) : RecyclerView.Adapter<ForecastAdapter.HourlyForecastViewHolder>()  {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastAdapter.HourlyForecastViewHolder {
@@ -29,32 +31,33 @@ class ForecastAdapter(
         val weatherCode = hourlyForecast.weather_code[position]
         val temperature = hourlyForecast.temperature_2m[position]
         val wind = hourlyForecast.wind_speed_10m[position]
-        holder.bind(timeStamp, weatherCode, temperature, wind)
+        val windDirection = Util.getWindDirection(hourlyForecast.wind_direction_10m[position])
+        Log.d("onBindViewHolder position", position.toString())
+        holder.bind(timeStamp, weatherCode, temperature, wind, windDirection, hourlyUnits)
     }
 
 
     override fun getItemCount(): Int {
-        return 24 //TODO replace with constant
+        Log.d ("forecast adapter, item count", hourlyForecast.time.size.toString())
+        return Constant.QUANTITY_HOURS_FOR_TODAY_FRAGMENT
     }
 
 
 
-    class HourlyForecastViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        //TODO add hourly units?
+    inner class HourlyForecastViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val timeStamp: TextView = itemView.findViewById(R.id.timeStamp)
         private val weatherIcon: ImageView = itemView.findViewById(R.id.weatherIcon)
         private val temperatureHour: TextView = itemView.findViewById(R.id.temperatureHour)
         private val windHour: TextView = itemView.findViewById(R.id.windHour)
 
-        fun bind(time: String, weatherCode: Int, temperature: Double, wind: Double) {
+        fun bind(time: String, weatherCode: Int, temperature: Double, wind: Double, windDirection: String, units: HourlyUnits) {
+            Log.d("ForecastViewHolder: onBind", time)
             timeStamp.text = Util.formatTimeHHMM(time)
-            Log.d("timeStamp", timeStamp.text.toString())
-//            weatherIcon.setImageDrawable(Util.setWeatherImage(context, weatherCode)
-            temperatureHour.text = temperature.toString()
-            windHour.text = wind.toString()
-//            cityName.text = city.name
-//            cityRegion.text = city.admin1
-//            cityCountry.text = city.country
+            weatherIcon.setImageDrawable(Util.setWeatherImage(context, weatherCode))
+            temperatureHour.text = context.getString(R.string.temperature_text, temperature.toString(),units.temperature_2m)
+            windHour.text = context.getString(R.string.wind_text, wind.toString(), units.wind_speed_10m, windDirection)
+            val windIcon = context.let { it1 -> Util.resizeVectorDrawable(it1, R.drawable.ic_weather_wind, 40, 40) }
+            windHour.setCompoundDrawablesWithIntrinsicBounds(windIcon, null, null, null)
         }
     }
 }

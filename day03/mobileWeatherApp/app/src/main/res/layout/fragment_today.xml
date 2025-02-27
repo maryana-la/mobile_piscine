@@ -5,6 +5,7 @@
     android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingBottom="80dp"
     android:gravity="top|center"
     android:orientation="vertical"
     tools:context=".pageviewer.Today">
@@ -31,32 +32,35 @@
         android:maxLines="2"
         android:ellipsize="end" />
 
-
-    <HorizontalScrollView
-        android:id="@+id/scrollView"
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="true" >
-<!--        android:paddingBottom="100dp"-->
+        android:layout_weight="3"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"
+        android:background="@drawable/background_transparent_yellow"/>
 
-        <LinearLayout
-            android:id="@+id/innerLayout"
+    <LinearLayout
+        android:id="@+id/innerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/forecastRecyclerView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/forecastRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent_white"
-                android:clipToPadding="false"
-                android:scrollbars="horizontal"
-                android:visibility="gone" />
-
-
-        </LinearLayout>
-    </HorizontalScrollView>
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/background_transparent_yellow"
+            android:clipToPadding="false"
+            android:scrollbars="horizontal"
+            android:visibility="gone" />
+    </LinearLayout>
 
 </LinearLayout>

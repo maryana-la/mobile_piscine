@@ -1,7 +1,8 @@
 package com.mobilepiscine42.advanced_weather_app.api
 
 object Constant {
-    val REQUEST_CODE_LOCATION_PERMISSION = 1001
+    const val REQUEST_CODE_LOCATION_PERMISSION = 1001
+    const val QUANTITY_HOURS_FOR_TODAY_FRAGMENT = 24
     const val WEATHER_API_BASE_URL = "https://api.open-meteo.com/v1/"
     const val GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/"
     const val REVERSE_GEOCODING_URL = "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/"

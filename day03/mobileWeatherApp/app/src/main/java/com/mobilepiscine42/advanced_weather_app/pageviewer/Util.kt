@@ -16,18 +16,31 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
+import com.github.mikephil.charting.animation.Easing
+import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.api.Constant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
 
 class Util {
 
     companion object {
 
         fun getWindDirection(angle: Int): String {
-            val directions = listOf("↓ N", "↙ NE", "← E", "↖ SE", "↑ S", "↗ SW", "→ W", "↘ NW")
+            val directions = listOf("↓", "↙", "←", "↖", "↑", "↗", "→", "↘")
             return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
         }
+
+//        fun getWindDirection(angle: Int): String {
+//            val directions = listOf("↓ N", "↙ NE", "← E", "↖ SE", "↑ S", "↗ SW", "→ W", "↘ NW")
+//            return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
+//        }
 
         fun formatTimeHHMM(input: String): String {
             val dateTime = LocalDateTime.parse(input)
@@ -159,6 +172,50 @@ class Util {
             drawable.draw(canvas)
 
             return BitmapDrawable(context.resources, bitmap)
+        }
+
+        fun createChart(sharedViewModel: SharedViewModel, lineChart: LineChart) {
+            val entries = ArrayList<Entry>()
+
+            val hourlyTemp = sharedViewModel.getWeatherForecast().hourly.temperature_2m
+
+            for (i in 0 until Constant.QUANTITY_HOURS_FOR_TODAY_FRAGMENT) {
+                entries.add(Entry(i.toFloat(), hourlyTemp[i].toFloat()))
+            }
+
+            val dataSet = LineDataSet(entries, "Temperature")
+
+            dataSet.setDrawValues(false)
+            dataSet.setDrawFilled(false)
+            dataSet.setDrawCircles(true)
+//            dataSet.setCircleColor(Color.rgb(255,87,34)) //orange
+            dataSet.setCircleColor(Color.rgb(16,236,159))
+            dataSet.circleRadius = 5f
+            dataSet.circleHoleColor = Color.WHITE
+            dataSet.color = Color.rgb(16,236,159)
+            dataSet.valueTextSize = 10f
+            dataSet.lineWidth = 2f
+
+            lineChart.data = LineData(dataSet)
+
+            lineChart.xAxis?.position = XAxis.XAxisPosition.BOTTOM
+            lineChart.xAxis?.textColor = Color.WHITE
+            lineChart.xAxis?.valueFormatter = TimeAxisValueFormatter()
+            lineChart.xAxis?.setDrawGridLines(true)
+            lineChart.legend?.isEnabled = false
+
+            lineChart.axisLeft.textColor = Color.WHITE
+            lineChart.axisLeft.setDrawGridLines(true)
+
+            lineChart.axisRight?.isEnabled = false
+            lineChart.description.isEnabled = false
+            lineChart.invalidate()
+            lineChart.visibility = View.VISIBLE
+
+            lineChart.setTouchEnabled(true)
+            lineChart.setPinchZoom(true)
+
+            lineChart.animateX(1800, Easing.EaseInExpo)
         }
     }
 }

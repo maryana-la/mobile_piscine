@@ -80,4 +80,6 @@ dependencies {
 
     // optional - ReactiveStreams support for LiveData
     implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

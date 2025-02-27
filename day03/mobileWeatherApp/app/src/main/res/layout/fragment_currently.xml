@@ -39,7 +39,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textColor="#10EC9F"
+        android:textColor="@color/light_green"
         android:textSize="60sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/region"
