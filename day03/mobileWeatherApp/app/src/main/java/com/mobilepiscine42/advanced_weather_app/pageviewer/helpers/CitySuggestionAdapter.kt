@@ -1,4 +1,4 @@
-package com.mobilepiscine42.advanced_weather_app
+package com.mobilepiscine42.advanced_weather_app.pageviewer.helpers
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.mobilepiscine42.advanced_weather_app.R
 import com.mobilepiscine42.advanced_weather_app.geocoding_api.Result
 
 class CitySuggestionAdapter(

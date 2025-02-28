@@ -1,4 +1,4 @@
-package com.mobilepiscine42.advanced_weather_app.pageviewer
+package com.mobilepiscine42.advanced_weather_app.pageviewer.helpers
 
 import android.content.Context
 import android.view.LayoutInflater

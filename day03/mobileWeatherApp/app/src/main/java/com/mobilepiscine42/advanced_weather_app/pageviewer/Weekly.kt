@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.LineChart
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.Util
+import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.WeeklyForecastAdapter
 
 class Weekly : Fragment() {
 

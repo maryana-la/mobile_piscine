@@ -1,13 +1,11 @@
-package com.mobilepiscine42.advanced_weather_app
+package com.mobilepiscine42.advanced_weather_app.api
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mobilepiscine42.advanced_weather_app.api.Constant
-import kotlinx.coroutines.launch
-import com.mobilepiscine42.advanced_weather_app.api.RetrofitInstance
 import com.mobilepiscine42.advanced_weather_app.pageviewer.SharedViewModel
 import com.mobilepiscine42.advanced_weather_app.reverse_geocoding_api.ReverseGeoViewModel
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
