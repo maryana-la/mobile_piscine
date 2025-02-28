@@ -7,6 +7,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.icu.text.SimpleDateFormat
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -18,14 +19,17 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.mobilepiscine42.advanced_weather_app.R
 import com.mobilepiscine42.advanced_weather_app.api.Constant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 class Util {
@@ -37,11 +41,6 @@ class Util {
             return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
         }
 
-//        fun getWindDirection(angle: Int): String {
-//            val directions = listOf("↓ N", "↙ NE", "← E", "↖ SE", "↑ S", "↗ SW", "→ W", "↘ NW")
-//            return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
-//        }
-
         fun formatTimeHHMM(input: String): String {
             val dateTime = LocalDateTime.parse(input)
             val formatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -49,22 +48,14 @@ class Util {
         }
 
         fun formatDate(input: String): String {
-            val dateTime = LocalDateTime.parse(input)
-            val formatter = DateTimeFormatter.ofPattern("dd mmm yyyy")
-            return dateTime.format(formatter)
-        }
-
-        fun setTextViewForFragments(input : String, context : Context, sizeText : Float) : TextView {
-            val result = TextView(context).apply {
-                text = input
-                textSize = sizeText
-                textAlignment = TEXT_ALIGNMENT_CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    1f)
+            return try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+                val date = inputFormat.parse(input)
+                date?.let { outputFormat.format(it) } ?: ""
+            } catch (e: Exception) {
+                ""
             }
-            return result
         }
 
         fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
@@ -174,7 +165,7 @@ class Util {
             return BitmapDrawable(context.resources, bitmap)
         }
 
-        fun createChart(sharedViewModel: SharedViewModel, lineChart: LineChart) {
+        fun createChartForHourlyForecast(sharedViewModel: SharedViewModel, lineChart: LineChart) {
             val entries = ArrayList<Entry>()
 
             val hourlyTemp = sharedViewModel.getWeatherForecast().hourly.temperature_2m
@@ -188,7 +179,6 @@ class Util {
             dataSet.setDrawValues(false)
             dataSet.setDrawFilled(false)
             dataSet.setDrawCircles(true)
-//            dataSet.setCircleColor(Color.rgb(255,87,34)) //orange
             dataSet.setCircleColor(Color.rgb(16,236,159))
             dataSet.circleRadius = 5f
             dataSet.circleHoleColor = Color.WHITE
@@ -198,11 +188,74 @@ class Util {
 
             lineChart.data = LineData(dataSet)
 
+            //set Axis
+            setLineChartAxis(lineChart)
+            lineChart.legend?.isEnabled = false
+            lineChart.setExtraOffsets(0f, 0f, 5f, 10f)
+        }
+
+
+        fun createChartForDailyForecast(sharedViewModel: SharedViewModel, lineChart: LineChart) {
+            setLineChartAxis(lineChart)
+            val dateLabels = ArrayList<String>()
+            val daily = sharedViewModel.getWeatherForecast().daily
+
+            val minTemperatureLine = ArrayList<Entry>()
+            for(i in 0 until Constant.FORECAST_DAYS) {
+                minTemperatureLine.add(Entry(i.toFloat(), daily.temperature_2m_min[i].toFloat()))
+                dateLabels.add(formatDate(daily.time[i]))
+            }
+
+            val maxTemperatureLine = ArrayList<Entry>()
+            for(i in 0 until Constant.FORECAST_DAYS) {
+                maxTemperatureLine.add(Entry(i.toFloat(), daily.temperature_2m_max[i].toFloat()))
+            }
+
+
+            val minDataSet = LineDataSet(minTemperatureLine, "Min Temperature")
+            minDataSet.setDrawValues(false)
+            minDataSet.setDrawFilled(false)
+            minDataSet.setDrawCircles(true)
+            minDataSet.setCircleColor(Color.rgb(33,150,243))
+            minDataSet.circleRadius = 5f
+            minDataSet.circleHoleColor = Color.WHITE
+            minDataSet.color = Color.rgb(33,150,243)
+            minDataSet.valueTextSize = 10f
+            minDataSet.lineWidth = 2f
+
+            val maxDataSet = LineDataSet(maxTemperatureLine, "Max Temperature")
+            maxDataSet.setDrawValues(false)
+            maxDataSet.setDrawFilled(false)
+            maxDataSet.setDrawCircles(true)
+            maxDataSet.setCircleColor(Color.RED)
+            maxDataSet.circleRadius = 5f
+            maxDataSet.circleHoleColor = Color.WHITE
+            maxDataSet.color = Color.RED
+            maxDataSet.valueTextSize = 10f
+            maxDataSet.lineWidth = 2f
+
+
+            lineChart.data = LineData(minDataSet, maxDataSet)
+            lineChart.xAxis.valueFormatter = IndexAxisValueFormatter(dateLabels)
+            lineChart.xAxis.granularity = 1f
+            lineChart.xAxis.setLabelCount(dateLabels.size, true)
+
+
+
+
+            lineChart.legend?.textColor = Color.WHITE
+            lineChart.legend?.textSize = 12f
+            lineChart.legend?.horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+            lineChart.legend?.verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            lineChart.setExtraOffsets(0f, 0f, 5f, 15f)
+
+        }
+
+        private fun setLineChartAxis(lineChart: LineChart) {
             lineChart.xAxis?.position = XAxis.XAxisPosition.BOTTOM
             lineChart.xAxis?.textColor = Color.WHITE
             lineChart.xAxis?.valueFormatter = TimeAxisValueFormatter()
             lineChart.xAxis?.setDrawGridLines(true)
-            lineChart.legend?.isEnabled = false
 
             lineChart.axisLeft.textColor = Color.WHITE
             lineChart.axisLeft.setDrawGridLines(true)

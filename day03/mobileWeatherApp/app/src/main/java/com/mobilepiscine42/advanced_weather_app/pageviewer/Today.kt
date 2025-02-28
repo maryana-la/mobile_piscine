@@ -30,6 +30,7 @@ class Today : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val screenHeight = resources.displayMetrics.heightPixels
         val view = inflater.inflate(R.layout.fragment_today, container, false)
         val mainLayout = view?.findViewById<LinearLayout>(R.id.mainLayout)
         val lineChart = view?.findViewById<LineChart>(R.id.lineChart)
@@ -37,8 +38,12 @@ class Today : Fragment() {
         val region = view?.findViewById<TextView>(R.id.region)
         val errorMessage = TextView(context)
         val forecastRecyclerView = view?.findViewById<RecyclerView>(R.id.forecastRecyclerView)!!
+        forecastRecyclerView.setOnTouchListener { v, _ ->
+            v.parent.requestDisallowInterceptTouchEvent(true) // Stop parent from intercepting touch
+            false
+        }
 
-        forecastRecyclerView.setOnTouchListener { v, event ->
+        lineChart?.setOnTouchListener { v, _ ->
             v.parent.requestDisallowInterceptTouchEvent(true) // Stop parent from intercepting touch
             false
         }
@@ -54,17 +59,19 @@ class Today : Fragment() {
         }
 
         sharedViewModel.forecastLiveData.observe(viewLifecycleOwner) {
-            val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
             mainLayout?.removeView(errorMessage)
             Util.removeErrorMessage(errorMessage)
 
+            val hourlyForecast : Hourly = sharedViewModel.getWeatherForecast().hourly
+
             forecastRecyclerView.visibility = View.VISIBLE
             forecastRecyclerView.layoutManager = LinearLayoutManager(parentFragment?.context, LinearLayoutManager.HORIZONTAL, false)
-            val adapter = context?.let { it1 -> ForecastAdapter(it1, hourlyForecast, sharedViewModel.getWeatherForecast().hourly_units) }!!
+            val adapter = context?.let { it1 -> HourlyForecastAdapter(it1, hourlyForecast, sharedViewModel.getWeatherForecast().hourly_units) }!!
             forecastRecyclerView.adapter = adapter
 
             if (lineChart != null) {
-                Util.createChart(sharedViewModel, lineChart)
+                lineChart.layoutParams.height = (screenHeight * 0.3).toInt()
+                Util.createChartForHourlyForecast(sharedViewModel, lineChart)
             }
         }
 

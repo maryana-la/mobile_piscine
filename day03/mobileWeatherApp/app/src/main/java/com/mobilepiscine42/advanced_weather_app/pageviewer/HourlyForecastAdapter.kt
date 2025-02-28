@@ -9,24 +9,24 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.api.Constant
 import com.mobilepiscine42.advanced_weather_app.api.Hourly
 import com.mobilepiscine42.advanced_weather_app.api.HourlyUnits
-import com.mobilepiscine42.advanced_weather_app.api.Constant
 
-class ForecastAdapter(
+class HourlyForecastAdapter(
     private val context: Context,
     private var hourlyForecast: Hourly,
     private val hourlyUnits: HourlyUnits
-) : RecyclerView.Adapter<ForecastAdapter.HourlyForecastViewHolder>()  {
+) : RecyclerView.Adapter<HourlyForecastAdapter.HourlyForecastViewHolder>()  {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastAdapter.HourlyForecastViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourlyForecastAdapter.HourlyForecastViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_hourly_forecast, parent, false)
         return HourlyForecastViewHolder(view)
     }
 
 
-    override fun onBindViewHolder(holder: ForecastAdapter.HourlyForecastViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: HourlyForecastAdapter.HourlyForecastViewHolder, position: Int) {
         val timeStamp = hourlyForecast.time[position]
         val weatherCode = hourlyForecast.weather_code[position]
         val temperature = hourlyForecast.temperature_2m[position]
