@@ -6,12 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.Util
 
 
 class Currently : Fragment() {
@@ -26,7 +27,7 @@ class Currently : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_currently, container, false)
-        val mainLayout = view?.findViewById<ConstraintLayout>(R.id.mainLayout)
+        val mainLayout = view?.findViewById<LinearLayout>(R.id.mainLayout)
         val city = view?.findViewById<TextView>(R.id.city)
         val region = view?.findViewById<TextView>(R.id.region)
         val temperature = view?.findViewById<TextView>(R.id.temperature)
@@ -64,20 +65,6 @@ class Currently : Fragment() {
             wind?.setCompoundDrawablesWithIntrinsicBounds(windIcon, null, null, null)
         }
 
-//        sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
-//            if (sharedViewModel.getErrorMsg().isNotEmpty()) {
-//                Log.e("FRAGMENT Currently", "Error message print")
-//                city?.text = ""
-//                region?.text = ""
-//                temperature?.text = ""
-//                wind?.text = ""
-//                mainLayout?.removeView(errorMessage)
-//                if (mainLayout != null) {
-//                    errorMessage.text = sharedViewModel.getErrorMsg()
-//                    Util.setupErrorMessage(errorMessage, mainLayout)
-//                }
-//            }
-
         sharedViewModel.errorLiveData.observe(viewLifecycleOwner) {
             if (sharedViewModel.getErrorMsg().isNotEmpty()) {
                 Log.e("FRAGMENT Currently", "Error message print")
@@ -91,7 +78,7 @@ class Currently : Fragment() {
                 mainLayout?.removeView(errorMessage)
                 if (mainLayout != null) {
                     errorMessage.text = sharedViewModel.getErrorMsg()
-                    Util.setupErrorMessageConstraint(errorMessage, mainLayout)
+                    Util.setupErrorMessage(errorMessage, mainLayout)
                 }
             }
         }

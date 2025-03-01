@@ -1,4 +1,4 @@
-package com.mobilepiscine42.advanced_weather_app.pageviewer
+package com.mobilepiscine42.advanced_weather_app.pageviewer.helpers
 
 import android.content.Context
 import android.util.Log
@@ -9,24 +9,24 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.api.Constant
 import com.mobilepiscine42.advanced_weather_app.api.Hourly
 import com.mobilepiscine42.advanced_weather_app.api.HourlyUnits
-import com.mobilepiscine42.advanced_weather_app.api.Constant
 
-class ForecastAdapter(
+class HourlyForecastAdapter(
     private val context: Context,
     private var hourlyForecast: Hourly,
     private val hourlyUnits: HourlyUnits
-) : RecyclerView.Adapter<ForecastAdapter.HourlyForecastViewHolder>()  {
+) : RecyclerView.Adapter<HourlyForecastAdapter.HourlyForecastViewHolder>()  {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ForecastAdapter.HourlyForecastViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourlyForecastViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_hourly_forecast, parent, false)
         return HourlyForecastViewHolder(view)
     }
 
 
-    override fun onBindViewHolder(holder: ForecastAdapter.HourlyForecastViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: HourlyForecastViewHolder, position: Int) {
         val timeStamp = hourlyForecast.time[position]
         val weatherCode = hourlyForecast.weather_code[position]
         val temperature = hourlyForecast.temperature_2m[position]
@@ -56,7 +56,14 @@ class ForecastAdapter(
             weatherIcon.setImageDrawable(Util.setWeatherImage(context, weatherCode))
             temperatureHour.text = context.getString(R.string.temperature_text, temperature.toString(),units.temperature_2m)
             windHour.text = context.getString(R.string.wind_text, wind.toString(), units.wind_speed_10m, windDirection)
-            val windIcon = context.let { it1 -> Util.resizeVectorDrawable(it1, R.drawable.ic_weather_wind, 40, 40) }
+            val windIcon = context.let { it1 ->
+                Util.resizeVectorDrawable(
+                    it1,
+                    R.drawable.ic_weather_wind,
+                    40,
+                    40
+                )
+            }
             windHour.setCompoundDrawablesWithIntrinsicBounds(windIcon, null, null, null)
         }
     }

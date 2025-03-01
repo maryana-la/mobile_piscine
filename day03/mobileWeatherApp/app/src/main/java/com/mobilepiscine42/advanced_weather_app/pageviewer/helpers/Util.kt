@@ -1,12 +1,12 @@
-package com.mobilepiscine42.advanced_weather_app.pageviewer
+package com.mobilepiscine42.advanced_weather_app.pageviewer.helpers
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.icu.text.SimpleDateFormat
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
@@ -14,18 +14,22 @@ import android.view.View
 import android.view.View.TEXT_ALIGNMENT_CENTER
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.github.mikephil.charting.animation.Easing
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.mobilepiscine42.advanced_weather_app.R
 import com.mobilepiscine42.advanced_weather_app.api.Constant
+import com.mobilepiscine42.advanced_weather_app.pageviewer.SharedViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 class Util {
@@ -34,13 +38,8 @@ class Util {
 
         fun getWindDirection(angle: Int): String {
             val directions = listOf("↓", "↙", "←", "↖", "↑", "↗", "→", "↘")
-            return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
+            return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()]
         }
-
-//        fun getWindDirection(angle: Int): String {
-//            val directions = listOf("↓ N", "↙ NE", "← E", "↖ SE", "↑ S", "↗ SW", "→ W", "↘ NW")
-//            return directions[(Math.round(angle.toDouble() / 45) % 8).toInt()];
-//        }
 
         fun formatTimeHHMM(input: String): String {
             val dateTime = LocalDateTime.parse(input)
@@ -49,25 +48,16 @@ class Util {
         }
 
         fun formatDate(input: String): String {
-            val dateTime = LocalDateTime.parse(input)
-            val formatter = DateTimeFormatter.ofPattern("dd mmm yyyy")
-            return dateTime.format(formatter)
-        }
-
-        fun setTextViewForFragments(input : String, context : Context, sizeText : Float) : TextView {
-            val result = TextView(context).apply {
-                text = input
-                textSize = sizeText
-                textAlignment = TEXT_ALIGNMENT_CENTER
-                layoutParams = LinearLayout.LayoutParams(
-                    0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    1f)
+            return try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("dd/MM", Locale.getDefault())
+                val date = inputFormat.parse(input)
+                date?.let { outputFormat.format(it) } ?: ""
+            } catch (e: Exception) {
+                Log.e("FormatDate Exception", e.toString())
+                ""
             }
-            return result
         }
-
-        fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
         fun setupErrorMessage(errorMessage: TextView, mainLayout: LinearLayout) {
             val layoutParams = LinearLayout.LayoutParams(
@@ -75,43 +65,24 @@ class Util {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
                 gravity = Gravity.CENTER
-                bottomMargin = 60.dpToPx()
+                leftMargin = 10
+                rightMargin = 10
             }
-            errorMessage.layoutParams = layoutParams
-            errorMessage.setTextColor(Color.RED)
-            errorMessage.textAlignment = TEXT_ALIGNMENT_CENTER
-            errorMessage.textSize = 25f
-            errorMessage.maxLines = 3
-            errorMessage.ellipsize = TextUtils.TruncateAt.END
-            errorMessage.setLineSpacing(4f, 1.2f)
-            errorMessage.visibility = View.VISIBLE
-            mainLayout.post {
-                if (errorMessage.parent == null) {
-                    Log.i("mainLayout?.post", errorMessage.text.toString())
-                    mainLayout.addView(errorMessage, 3)
-                } else {
-                    Log.i("Error msg parent", errorMessage.parent.toString())
-                }
-            }
-        }
 
-        fun setupErrorMessageConstraint(errorMessage: TextView, mainLayout: ConstraintLayout) {
-//            val layoutParams = ConstraintLayout.LayoutParams().apply {
-//                gravity = Gravity.CENTER
-//                bottomMargin = 60.dpToPx()
-//            }
-//            errorMessage.layoutParams = layoutParams
-            errorMessage.setTextColor(Color.RED)
-            errorMessage.textAlignment = TEXT_ALIGNMENT_CENTER
-            errorMessage.textSize = 25f
-            errorMessage.maxLines = 3
-            errorMessage.ellipsize = TextUtils.TruncateAt.END
-            errorMessage.setLineSpacing(4f, 1.2f)
-            errorMessage.visibility = View.VISIBLE
+            errorMessage.layoutParams = layoutParams
+            errorMessage.apply {
+                setTextColor(Color.RED)
+                textAlignment = TEXT_ALIGNMENT_CENTER
+                textSize = 25f
+                maxLines = 3
+                ellipsize = TextUtils.TruncateAt.END
+                setLineSpacing(4f, 1.2f)
+                visibility = View.VISIBLE
+            }
             mainLayout.post {
                 if (errorMessage.parent == null) {
                     Log.i("mainLayout?.post", errorMessage.text.toString())
-                    mainLayout.addView(errorMessage, 3)
+                    mainLayout.addView(errorMessage, 2)
                 } else {
                     Log.i("Error msg parent", errorMessage.parent.toString())
                 }
@@ -174,48 +145,88 @@ class Util {
             return BitmapDrawable(context.resources, bitmap)
         }
 
-        fun createChart(sharedViewModel: SharedViewModel, lineChart: LineChart) {
+        fun createChartForHourlyForecast(sharedViewModel: SharedViewModel, lineChart: LineChart) {
             val entries = ArrayList<Entry>()
-
-            val hourlyTemp = sharedViewModel.getWeatherForecast().hourly.temperature_2m
-
+            val hourlyTemp = sharedViewModel.getWeatherForecast().hourly
             for (i in 0 until Constant.QUANTITY_HOURS_FOR_TODAY_FRAGMENT) {
-                entries.add(Entry(i.toFloat(), hourlyTemp[i].toFloat()))
+                entries.add(Entry(i.toFloat(), hourlyTemp.temperature_2m[i].toFloat()))
             }
 
             val dataSet = LineDataSet(entries, "Temperature")
-
-            dataSet.setDrawValues(false)
-            dataSet.setDrawFilled(false)
-            dataSet.setDrawCircles(true)
-//            dataSet.setCircleColor(Color.rgb(255,87,34)) //orange
-            dataSet.setCircleColor(Color.rgb(16,236,159))
-            dataSet.circleRadius = 5f
-            dataSet.circleHoleColor = Color.WHITE
-            dataSet.color = Color.rgb(16,236,159)
-            dataSet.valueTextSize = 10f
-            dataSet.lineWidth = 2f
+            designDataSet(dataSet,Color.rgb(16,236,159), Color.WHITE)
 
             lineChart.data = LineData(dataSet)
-
-            lineChart.xAxis?.position = XAxis.XAxisPosition.BOTTOM
-            lineChart.xAxis?.textColor = Color.WHITE
-            lineChart.xAxis?.valueFormatter = TimeAxisValueFormatter()
-            lineChart.xAxis?.setDrawGridLines(true)
+            setLineChartAxis(lineChart, TimeAxisValueFormatter())
             lineChart.legend?.isEnabled = false
+            lineChart.setExtraOffsets(0f, 0f, 5f, 10f)
+        }
 
-            lineChart.axisLeft.textColor = Color.WHITE
-            lineChart.axisLeft.setDrawGridLines(true)
 
-            lineChart.axisRight?.isEnabled = false
-            lineChart.description.isEnabled = false
+        fun createChartForDailyForecast(sharedViewModel: SharedViewModel, lineChart: LineChart) {
+            val dateLabels = ArrayList<String>()
+            val daily = sharedViewModel.getWeatherForecast().daily
+
+            val minTemperatureEntry = ArrayList<Entry>()
+            val maxTemperatureEntry = ArrayList<Entry>()
+            for(i in 0 until Constant.FORECAST_DAYS) {
+                minTemperatureEntry.add(Entry(i.toFloat(), daily.temperature_2m_min[i].toFloat()))
+                maxTemperatureEntry.add(Entry(i.toFloat(), daily.temperature_2m_max[i].toFloat()))
+                dateLabels.add(formatDate(daily.time[i]))
+            }
+            setLineChartAxis(lineChart, IndexAxisValueFormatter(dateLabels))
+
+            val minDataSet = LineDataSet(minTemperatureEntry, "Min Temperature")
+            designDataSet(minDataSet,Color.rgb(33,150,243), Color.WHITE)
+
+            val maxDataSet = LineDataSet(maxTemperatureEntry, "Max Temperature")
+            designDataSet(maxDataSet, Color.RED, Color.WHITE)
+
+            lineChart.data = LineData(minDataSet, maxDataSet)
+            lineChart.xAxis.granularity = 1f
+            lineChart.xAxis.setLabelCount(dateLabels.size, true)
+            lineChart.setExtraOffsets(0f, 0f, 5f, 15f)
+
+            lineChart.legend.apply {
+                textColor = Color.WHITE
+                textSize = 12f
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+            }
+        }
+
+        private fun setLineChartAxis(lineChart: LineChart, formatter: ValueFormatter) {
+            lineChart.xAxis.apply {
+                position = XAxis.XAxisPosition.BOTTOM
+                textColor = Color.WHITE
+                valueFormatter = formatter
+                setDrawGridLines(true)
+            }
+
+            lineChart.apply {
+                axisLeft.textColor = Color.WHITE
+                axisLeft.setDrawGridLines(true)
+                axisRight?.isEnabled = false
+                description.isEnabled = false
+                visibility = View.VISIBLE
+                setTouchEnabled(true)
+                setPinchZoom(true)
+                animateX(1800, Easing.EaseInExpo)
+            }
             lineChart.invalidate()
-            lineChart.visibility = View.VISIBLE
+        }
 
-            lineChart.setTouchEnabled(true)
-            lineChart.setPinchZoom(true)
-
-            lineChart.animateX(1800, Easing.EaseInExpo)
+        private fun designDataSet(dataSet: LineDataSet, lineColor: Int, circleColor: Int) {
+            dataSet.apply {
+                setDrawValues(false)
+                setDrawFilled(false)
+                setDrawCircles(true)
+                setCircleColor(lineColor)
+                circleRadius = 5f
+                circleHoleColor = circleColor
+                color = lineColor
+                valueTextSize = 10f
+                lineWidth = 2f
+            }
         }
     }
 }

@@ -27,12 +27,13 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.mobilepiscine42.advanced_weather_app.api.Constant
 import com.mobilepiscine42.advanced_weather_app.api.Constant.REQUEST_CODE_LOCATION_PERMISSION
+import com.mobilepiscine42.advanced_weather_app.api.WeatherViewModel
 import com.mobilepiscine42.advanced_weather_app.geocoding_api.GeocodingViewModel
 import com.mobilepiscine42.advanced_weather_app.geocoding_api.Result
 import com.mobilepiscine42.advanced_weather_app.pageviewer.SharedViewModel
-import com.mobilepiscine42.advanced_weather_app.pageviewer.ViewPagerAdapter
+import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.CitySuggestionAdapter
+import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.ViewPagerAdapter
 import com.mobilepiscine42.advanced_weather_app.reverse_geocoding_api.ReverseGeoViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -187,7 +188,7 @@ class MainActivity : AppCompatActivity() {
         if (isLocationPermissionGranted()) {
             getGPS()
         } else {
-            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION), Constant.REQUEST_CODE_LOCATION_PERMISSION)
+            ActivityCompat.requestPermissions(this, arrayOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION),REQUEST_CODE_LOCATION_PERMISSION)
         }
     }
 

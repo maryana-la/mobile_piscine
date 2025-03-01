@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.car.ui.lib)
     implementation(libs.play.services.location)
     implementation(libs.androidx.tools.core)
+    implementation(libs.androidx.ui.text.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
