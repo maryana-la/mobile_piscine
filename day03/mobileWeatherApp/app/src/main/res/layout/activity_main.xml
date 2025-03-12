@@ -25,16 +25,6 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp" >
 
-<!--        <androidx.appcompat.widget.Toolbar-->
-<!--            android:id="@+id/topToolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginTop="5dp"-->
-<!--            android:layout_marginStart="10dp"-->
-<!--            android:layout_marginEnd="10dp"-->
-<!--            android:background="@drawable/background_border"-->
-<!--            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">-->
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -48,7 +38,6 @@
                     android:layout_weight="5"
                     android:closeIcon="@drawable/car_ui_icon_close"
                     android:queryHint="Search location..." />
-                <!--                android:iconifiedByDefault="false" = searchView.onActionViewExpanded()-->
 
                 <View
                     android:layout_width="1dp"
@@ -69,7 +58,6 @@
                     app:tint="@color/ivory" />
 
             </LinearLayout>
-<!--        </androidx.appcompat.widget.Toolbar>-->
     </com.google.android.material.appbar.AppBarLayout>
 
 
