@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mobilepiscine42.advanced_weather_app.pageviewer.SharedViewModel
 import com.mobilepiscine42.advanced_weather_app.reverse_geocoding_api.ReverseGeoViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -16,23 +17,20 @@ class WeatherViewModel : ViewModel() {
     fun getData (latitude : String, longitude : String, sharedViewModel: SharedViewModel, reverseGeoViewModel: ReverseGeoViewModel) {
         viewModelScope.launch {
             try {
-                val response = weatherApi.getWeather(
-                    latitude,
-                    longitude,
-                    Constant.CURRENT,
-                    Constant.HOURLY,
-                    Constant.DAILY,
-                    Constant.FORECAST_DAYS
-                )
+
+                val weatherDeferred = async { weatherApi.getWeather(
+                    latitude, longitude, Constant.CURRENT, Constant.HOURLY, Constant.DAILY, Constant.FORECAST_DAYS, Constant.TIMEZONE
+                ) }
+                val reverseGeoDeferred = async { reverseGeoViewModel.getData(latitude, longitude, sharedViewModel) }
+
+                val response = weatherDeferred.await()
+
                 if (response.isSuccessful) {
-                    Log.i("Respones : ", response.body().toString())
-                    val forecast = response.body()
-                    if (forecast != null) {
-                        reverseGeoViewModel.getData(latitude, longitude, sharedViewModel)
-                        sharedViewModel.setWeatherForecast(forecast)
-                    }
+                    Log.i("Response:", response.body().toString())
+                    sharedViewModel.setWeatherForecast(response.body()!!)
+                    reverseGeoDeferred.await() // Ensure reverse geocoding completes
                 } else {
-                    Log.i("Error1 : ", response.message())
+                    Log.i("Error:", response.message())
                     sharedViewModel.setErrorMsg("Location is not found")
                 }
             } catch ( e : IOException) {

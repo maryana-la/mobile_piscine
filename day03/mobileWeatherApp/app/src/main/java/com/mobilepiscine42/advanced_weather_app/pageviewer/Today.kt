@@ -14,9 +14,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.mikephil.charting.charts.LineChart
 import com.mobilepiscine42.advanced_weather_app.R
+import com.mobilepiscine42.advanced_weather_app.api.Constant
 import com.mobilepiscine42.advanced_weather_app.api.Hourly
 import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.HourlyForecastAdapter
 import com.mobilepiscine42.advanced_weather_app.pageviewer.helpers.Util
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 
 class Today : Fragment() {
@@ -68,7 +71,22 @@ class Today : Fragment() {
 
             forecastRecyclerView.visibility = View.VISIBLE
             forecastRecyclerView.layoutManager = LinearLayoutManager(parentFragment?.context, LinearLayoutManager.HORIZONTAL, false)
-            val adapter = context?.let { it1 -> HourlyForecastAdapter(it1, hourlyForecast, sharedViewModel.getWeatherForecast().hourly_units) }!!
+
+            // create variable for next 24 hours
+            val zoneId = ZoneId.of(sharedViewModel.getWeatherForecast().timezone_abbreviation)
+            val currentTime = ZonedDateTime.now(zoneId)
+            val hour = currentTime.hour
+            val endOfRange = hour + Constant.QUANTITY_HOURS_FOR_TODAY_FRAGMENT
+
+            val next24hours = Hourly(
+                hourlyForecast.temperature_2m.subList(hour, endOfRange),
+                hourlyForecast.time.subList(hour, endOfRange),
+                hourlyForecast.weather_code.subList(hour, endOfRange),
+                hourlyForecast.wind_direction_10m.subList(hour, endOfRange),
+                hourlyForecast.wind_speed_10m.subList(hour, endOfRange)
+            )
+
+            val adapter = context?.let { it1 -> HourlyForecastAdapter(it1, next24hours, sharedViewModel.getWeatherForecast().hourly_units) }!!
             forecastRecyclerView.adapter = adapter
 
             if (lineChart != null) {

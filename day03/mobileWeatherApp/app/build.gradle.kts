@@ -64,23 +64,23 @@ dependencies {
     // LiveData
     implementation(libs.androidx.lifecycle.livedata.ktx)
     // Lifecycles only (without ViewModel or LiveData)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     // Lifecycle utilities for Compose
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Saved state module for ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
 
-    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.common.java8)
 
     // optional - helpers for implementing LifecycleOwner in a Service
-    implementation("androidx.lifecycle:lifecycle-service:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.service)
 
     // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation("androidx.lifecycle:lifecycle-process:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.process)
 
     // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version")
+    implementation(libs.androidx.lifecycle.reactivestreams.ktx)
 
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    implementation(libs.mpandroidchart)
 }

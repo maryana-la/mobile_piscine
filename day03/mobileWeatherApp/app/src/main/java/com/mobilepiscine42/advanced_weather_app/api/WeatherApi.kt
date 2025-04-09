@@ -13,6 +13,7 @@ interface WeatherApi {
         @Query("current") current : String,
         @Query("hourly") hourly : String,
         @Query("daily") daily : String,
-        @Query("forecast_days") forecastDays : Int
+        @Query("forecast_days") forecastDays : Int,
+        @Query("timezone") timezone : String
     ) : Response<WeatherModel>
 }

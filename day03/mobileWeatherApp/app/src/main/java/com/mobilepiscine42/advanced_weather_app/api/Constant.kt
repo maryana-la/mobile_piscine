@@ -13,6 +13,7 @@ object Constant {
     const val HOURLY = "temperature_2m,weather_code,wind_speed_10m,wind_direction_10m"
     const val CURRENT = "temperature_2m,weather_code,wind_speed_10m,wind_direction_10m"
     const val DAILY = "weather_code,temperature_2m_max,temperature_2m_min"
+    const val TIMEZONE = "auto"
     const val FORECAST_DAYS = 7
     const val LANG = "en"
     const val FORSTORAGE = "false"
